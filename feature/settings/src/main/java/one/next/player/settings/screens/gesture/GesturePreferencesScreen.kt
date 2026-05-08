@@ -223,7 +223,7 @@ private fun GesturePreferencesContent(
                     isLastItem = true,
                     icon = NextIcons.Replay,
                     value = uiState.preferences.seekIncrement.toFloat(),
-                    valueRange = 1.0f..60.0f,
+                    valueRange = 1.0f..PlayerPreferences.MAX_SEEK_INCREMENT.toFloat(),
                     onValueChange = { onEvent(GesturePreferencesUiEvent.UpdateSeekIncrement(it.toInt())) },
                     trailingContent = {
                         FilledIconButton(onClick = { onEvent(GesturePreferencesUiEvent.UpdateSeekIncrement(PlayerPreferences.DEFAULT_SEEK_INCREMENT)) }) {

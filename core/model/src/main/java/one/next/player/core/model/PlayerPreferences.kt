@@ -12,6 +12,9 @@ data class PlayerPreferences(
     val playerScreenOrientation: ScreenOrientation = ScreenOrientation.VIDEO_ORIENTATION,
     val playerVideoZoom: VideoContentScale = VideoContentScale.BEST_FIT,
     val defaultPlaybackSpeed: Float = 1.0f,
+    val videoSharpening: Float = 0f,
+    val skipOpeningSeconds: Int = 0,
+    val skipEndingSeconds: Int = 0,
     val shouldAutoPlay: Boolean = true,
     val shouldAutoEnterPip: Boolean = true,
     val shouldAutoPlayInBackground: Boolean = false,
@@ -73,13 +76,18 @@ data class PlayerPreferences(
         const val DEFAULT_VOLUME_GESTURE_SENSITIVITY = 0.50f
         const val DEFAULT_BRIGHTNESS_GESTURE_SENSITIVITY = 0.50f
         const val DEFAULT_LONG_PRESS_CONTROLS_SPEED = 2.0f
+        const val DEFAULT_VIDEO_SHARPENING = 0f
+        const val MAX_VIDEO_SHARPENING = 1f
+        const val MAX_SKIP_OPENING_SECONDS = 300
+        const val MAX_SKIP_ENDING_SECONDS = 300
         const val MIN_LONG_PRESS_CONTROLS_SPEED = 0.2f
         const val MAX_LONG_PRESS_CONTROLS_SPEED = 4.0f
         const val DEFAULT_SUBTITLE_TEXT_SIZE = 20
         const val DEFAULT_CONTROLLER_AUTO_HIDE_TIMEOUT = 4
         const val DEFAULT_PLAYER_VOLUME_PERCENTAGE = 100
+        const val MAX_PLAYER_INITIAL_VOLUME_PERCENTAGE = 80
         const val MAX_PLAYER_VOLUME_PERCENTAGE = 200
-        const val VOLUME_NORMALIZATION_GAIN_MB = 500
+        const val MAX_SEEK_INCREMENT = 120
     }
 }
 

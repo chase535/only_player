@@ -154,7 +154,7 @@ class GesturePreferencesViewModel @Inject constructor(
     private fun updateSeekIncrement(value: Int) {
         viewModelScope.launch {
             preferencesRepository.updatePlayerPreferences {
-                it.copy(seekIncrement = value)
+                it.copy(seekIncrement = value.coerceIn(1, PlayerPreferences.MAX_SEEK_INCREMENT))
             }
         }
     }

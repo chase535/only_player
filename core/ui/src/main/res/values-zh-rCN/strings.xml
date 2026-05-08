@@ -156,6 +156,13 @@
     <string name="stretch">拉伸</string>
     <string name="crop">裁剪</string>
     <string name="hundred_percent">100%</string>
+    <string name="percent">%1$d%%</string>
+    <string name="video_sharpening">视频锐化</string>
+    <string name="reset_video_sharpening">重置视频锐化</string>
+    <string name="skip_opening">跳过开头</string>
+    <string name="skip_ending">跳过结尾</string>
+    <string name="reset_skip_opening">重置跳过开头</string>
+    <string name="reset_skip_ending">重置跳过结尾</string>
     <string name="zoom_gesture">缩放手势</string>
     <string name="zoom_gesture_description">捏合可缩放视频</string>
     <string name="pause_on_headset_disconnect_desc">耳机从设备断开连接时暂停播放</string>
@@ -166,7 +173,7 @@
     <string name="remember_volume_level">记住音量</string>
     <string name="remember_volume_level_description">开始播放时恢复播放器音量</string>
     <string name="volume_normalization">音量标准化</string>
-    <string name="volume_normalization_desc">应用轻量增益，让偏小声的视频更容易听清</string>
+    <string name="volume_normalization_desc">通过动态范围处理缓和音量忽大忽小</string>
     <string name="fields">字段</string>
     <string name="system_caption_style">系统字幕样式</string>
     <string name="thumbnail">缩略图</string>

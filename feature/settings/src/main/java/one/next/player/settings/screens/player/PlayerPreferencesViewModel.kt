@@ -48,6 +48,9 @@ class PlayerPreferencesViewModel @Inject constructor(
             is PlayerPreferencesUiEvent.UpdatePreferredPlayerOrientation -> updatePreferredPlayerOrientation(event.value)
             is PlayerPreferencesUiEvent.UpdatePreferredControlButtonsPosition -> updatePreferredControlButtonsPosition(event.value)
             is PlayerPreferencesUiEvent.UpdateDefaultPlaybackSpeed -> updateDefaultPlaybackSpeed(event.value)
+            is PlayerPreferencesUiEvent.UpdateVideoSharpening -> updateVideoSharpening(event.value)
+            is PlayerPreferencesUiEvent.UpdateSkipOpeningSeconds -> updateSkipOpeningSeconds(event.value)
+            is PlayerPreferencesUiEvent.UpdateSkipEndingSeconds -> updateSkipEndingSeconds(event.value)
             is PlayerPreferencesUiEvent.UpdateControlAutoHideTimeout -> updateControlAutoHideTimeout(event.value)
             is PlayerPreferencesUiEvent.UpdateHiddenPlayerControls -> updateHiddenPlayerControls(event.value)
         }
@@ -128,6 +131,30 @@ class PlayerPreferencesViewModel @Inject constructor(
         }
     }
 
+    private fun updateVideoSharpening(value: Float) {
+        viewModelScope.launch {
+            preferencesRepository.updatePlayerPreferences {
+                it.copy(videoSharpening = value.coerceIn(PlayerPreferences.DEFAULT_VIDEO_SHARPENING, PlayerPreferences.MAX_VIDEO_SHARPENING).round(2))
+            }
+        }
+    }
+
+    private fun updateSkipOpeningSeconds(value: Int) {
+        viewModelScope.launch {
+            preferencesRepository.updatePlayerPreferences {
+                it.copy(skipOpeningSeconds = value.coerceIn(0, PlayerPreferences.MAX_SKIP_OPENING_SECONDS))
+            }
+        }
+    }
+
+    private fun updateSkipEndingSeconds(value: Int) {
+        viewModelScope.launch {
+            preferencesRepository.updatePlayerPreferences {
+                it.copy(skipEndingSeconds = value.coerceIn(0, PlayerPreferences.MAX_SKIP_ENDING_SECONDS))
+            }
+        }
+    }
+
     private fun updateControlAutoHideTimeout(value: Int) {
         viewModelScope.launch {
             preferencesRepository.updatePlayerPreferences {
@@ -166,6 +193,9 @@ sealed interface PlayerPreferencesUiEvent {
     data class UpdatePreferredPlayerOrientation(val value: ScreenOrientation) : PlayerPreferencesUiEvent
     data class UpdatePreferredControlButtonsPosition(val value: ControlButtonsPosition) : PlayerPreferencesUiEvent
     data class UpdateDefaultPlaybackSpeed(val value: Float) : PlayerPreferencesUiEvent
+    data class UpdateVideoSharpening(val value: Float) : PlayerPreferencesUiEvent
+    data class UpdateSkipOpeningSeconds(val value: Int) : PlayerPreferencesUiEvent
+    data class UpdateSkipEndingSeconds(val value: Int) : PlayerPreferencesUiEvent
     data class UpdateControlAutoHideTimeout(val value: Int) : PlayerPreferencesUiEvent
     data class UpdateHiddenPlayerControls(val value: Set<PlayerControl>) : PlayerPreferencesUiEvent
 }

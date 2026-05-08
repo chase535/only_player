@@ -169,6 +169,13 @@
     <string name="stretch">Stretch</string>
     <string name="crop">Crop</string>
     <string name="hundred_percent">100%</string>
+    <string name="percent">%1$d%%</string>
+    <string name="video_sharpening">Video sharpening</string>
+    <string name="reset_video_sharpening">Reset video sharpening</string>
+    <string name="skip_opening">Skip opening</string>
+    <string name="skip_ending">Skip ending</string>
+    <string name="reset_skip_opening">Reset skip opening</string>
+    <string name="reset_skip_ending">Reset skip ending</string>
     <string name="zoom_gesture">Zoom gesture</string>
     <string name="zoom_gesture_description">Pinch to zoom the video</string>
     <string name="audio_desc">Audio playback options</string>
@@ -179,7 +186,7 @@
     <string name="remember_volume_level">Remember volume level</string>
     <string name="remember_volume_level_description">Restore the player volume level when playback starts</string>
     <string name="volume_normalization">Volume normalization</string>
-    <string name="volume_normalization_desc">Apply a mild gain to make quiet videos easier to hear</string>
+    <string name="volume_normalization_desc">Reduce volume swings with dynamic range processing</string>
     <string name="system_caption_style">System caption style</string>
     <string name="system_caption_style_desc">Click to open system captioning preferences</string>
     <string name="fields">Fields</string>
