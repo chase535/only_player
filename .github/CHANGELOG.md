@@ -1,12 +1,14 @@
-- 媒体扫描排除 `.globalTrash`、`MIUI` 等系统保护目录
-- 补全简体/繁体中文缺失的「永久删除」「恢复」按钮翻译
-- 选中全是系统库视频时不再叠加二次确认弹窗
+- 继续播放设置改为开关
+- 修复媒体列表自动定位上次播放视频不准确的问题
+- 新增记住音量与音量标准化设置
+- 缩短自动定位上次视频的设置文案
 
 <details>
 <summary>English Version</summary>
 
-- Exclude system-protected directories (`.globalTrash`, `MIUI`) from media scanning
-- Add missing zh-CN/zh-TW translations for "Delete permanently" / "Restore"
-- Skip the in-app confirmation when all selected items are MediaStore-backed
+- Replace the resume preference dialog with a switch
+- Fix inaccurate auto-location of the last played video in media lists
+- Add remember volume and volume normalization settings
+- Shorten the copy for the last played video setting
 
 </details>
