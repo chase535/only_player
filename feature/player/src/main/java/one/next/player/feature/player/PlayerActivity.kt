@@ -388,7 +388,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            Logger.debug(TAG, "Add online subtitle requested: url=$subtitleUrl")
+            Logger.debug(TAG, "Add online subtitle requested: ${subtitleUrl.toLogSummary()}")
             val messageResId = try {
                 val downloadedSubtitle = withContext(Dispatchers.IO) {
                     onlineSubtitleRepository.downloadSubtitle(subtitleUrl)
@@ -422,6 +422,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun showToast(messageResId: Int) {
         Toast.makeText(this@PlayerActivity, messageResId, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun String.toLogSummary(): String {
+        val uri = Uri.parse(this)
+        val extension = uri.lastPathSegment?.substringAfterLast('.', missingDelimiterValue = "")?.lowercase().orEmpty()
+        return "scheme=${uri.scheme.orEmpty()} host=${uri.host.orEmpty()} extension=$extension"
     }
 
     private fun startPlayback() {

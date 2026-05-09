@@ -169,8 +169,9 @@ class DebugCommandReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         val seconds = intent.getIntExtra(EXTRA_SECONDS, PlayerPreferences.DEFAULT_CONTROLLER_AUTO_HIDE_TIMEOUT)
+            .coerceIn(1, 60)
         preferencesRepository.updatePlayerPreferences {
-            it.copy(controllerAutoHideTimeout = seconds.coerceIn(1, 60))
+            it.copy(controllerAutoHideTimeout = seconds)
         }
         Logger.info(TAG, "controllerAutoHideTimeout set to $seconds")
     }

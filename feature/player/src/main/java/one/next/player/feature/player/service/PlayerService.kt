@@ -94,7 +94,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
@@ -270,6 +272,9 @@ class PlayerService : MediaSessionService() {
     private var pendingStartupPreciseResumeToken: String? = null
     private var activeDecoderPriority: DecoderPriority = DecoderPriority.PREFER_DEVICE
     private var currentVideoFilters = VideoFilterPreferences.default()
+    private var pendingVideoFiltersJob: Job? = null
+    private var cachedGamma: Float? = null
+    private var cachedGammaEffect: Effect? = null
     private lateinit var fastStartMediaSourceFactory: DefaultMediaSourceFactory
     private lateinit var preciseSeekMediaSourceFactory: DefaultMediaSourceFactory
     private var sessionLoadErrorHandlingPolicy: LoadErrorHandlingPolicy? = null
@@ -1127,12 +1132,23 @@ class PlayerService : MediaSessionService() {
         preferences: PlayerPreferences,
     ) {
         val videoFilters = preferences.toVideoFilterPreferences()
+        pendingVideoFiltersJob?.cancel()
         if (currentVideoFilters == videoFilters) return
 
-        val effects = videoFilters.toVideoEffects()
-        currentVideoFilters = videoFilters
-        player.setVideoEffects(effects)
-        Logger.debug(TAG, "Apply video filters: $videoFilters effects=${effects.size}")
+        pendingVideoFiltersJob = serviceScope.launch {
+            val effects = withContext(Dispatchers.Default) {
+                videoFilters.toVideoEffects()
+            }
+            if (preferencesRepository.playerPreferences.value.toVideoFilterPreferences() != videoFilters) return@launch
+
+            currentVideoFilters = videoFilters
+            player.setVideoEffects(effects)
+            Logger.debug(TAG, "Apply video filters: $videoFilters effects=${effects.size}")
+        }.also { job ->
+            job.invokeOnCompletion {
+                if (pendingVideoFiltersJob == job) pendingVideoFiltersJob = null
+            }
+        }
     }
 
     private fun PlayerPreferences.toVideoFilterPreferences(): VideoFilterPreferences = VideoFilterPreferences(
@@ -1144,7 +1160,7 @@ class PlayerService : MediaSessionService() {
         sharpening = videoSharpening.coerceIn(PlayerPreferences.DEFAULT_VIDEO_SHARPENING, PlayerPreferences.MAX_VIDEO_SHARPENING),
     )
 
-    private fun VideoFilterPreferences.toVideoEffects(): List<Effect> = buildList {
+    private suspend fun VideoFilterPreferences.toVideoEffects(): List<Effect> = buildList {
         if (brightness != PlayerPreferences.DEFAULT_VIDEO_BRIGHTNESS) add(Brightness(brightness))
         if (contrast != PlayerPreferences.DEFAULT_VIDEO_CONTRAST) add(Contrast(contrast))
         if (saturation != PlayerPreferences.DEFAULT_VIDEO_SATURATION || hue != PlayerPreferences.DEFAULT_VIDEO_HUE) {
@@ -1155,13 +1171,29 @@ class PlayerService : MediaSessionService() {
                     .build(),
             )
         }
-        if (gamma != PlayerPreferences.DEFAULT_VIDEO_GAMMA) add(createGammaEffect(gamma))
+        if (gamma != PlayerPreferences.DEFAULT_VIDEO_GAMMA) add(getGammaEffect(gamma))
         if (sharpening > PlayerPreferences.DEFAULT_VIDEO_SHARPENING) add(VideoSharpeningEffect(sharpening))
     }
 
-    private fun createGammaEffect(gamma: Float): Effect {
+    private suspend fun getGammaEffect(gamma: Float): Effect {
+        synchronized(this) {
+            cachedGammaEffect?.takeIf { cachedGamma == gamma }?.let { return it }
+        }
+
+        val effect = createGammaEffect(gamma)
+        synchronized(this) {
+            cachedGamma = gamma
+            cachedGammaEffect = effect
+        }
+        return effect
+    }
+
+    private suspend fun createGammaEffect(gamma: Float): Effect {
+        val coroutineContext = currentCoroutineContext()
         val lut = Array(GAMMA_LUT_SIZE) { red ->
+            coroutineContext.ensureActive()
             Array(GAMMA_LUT_SIZE) { green ->
+                coroutineContext.ensureActive()
                 IntArray(GAMMA_LUT_SIZE) { blue ->
                     Color.rgb(
                         red.toGammaColor(gamma),
@@ -1177,6 +1209,13 @@ class PlayerService : MediaSessionService() {
     private fun Int.toGammaColor(gamma: Float): Int {
         val normalized = this.toFloat() / (GAMMA_LUT_SIZE - 1)
         return (normalized.pow(1f / gamma) * 255f).toInt().coerceIn(0, 255)
+    }
+
+    private fun String.toLogSummary(): String = Uri.parse(this).toLogSummary()
+
+    private fun Uri.toLogSummary(): String {
+        val extension = lastPathSegment?.substringAfterLast('.', missingDelimiterValue = "")?.lowercase().orEmpty()
+        return "scheme=${scheme.orEmpty()} host=${host.orEmpty()} extension=$extension"
     }
 
     private fun applyLoudnessEnhancerGain() {
@@ -1271,7 +1310,7 @@ class PlayerService : MediaSessionService() {
                         subtitleUri = subtitleUri,
                     )
                     player.addAdditionalSubtitleConfiguration(newSubConfiguration)
-                    Logger.info(TAG, "Added subtitle track: uri=$subtitleUri media=$playbackStateUri")
+                    Logger.info(TAG, "Added subtitle track: subtitle=${subtitleUri.toLogSummary()} media=${playbackStateUri.toLogSummary()}")
                     return@future SessionResult(SessionResult.RESULT_SUCCESS)
                 }
 
