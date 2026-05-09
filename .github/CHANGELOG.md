@@ -1,18 +1,14 @@
-- 新增自定义跳过开头和结尾
-- 新增最高 120 秒的自定义跳转增量
-- 新增视频锐化，默认关闭
-- 改进音量标准化，使用播放音频管线动态处理音量起伏
-- 启用记住音量时，初始恢复音量最高限制为 80%
-- 修复字幕设置页底部圆角不一致的问题
+- 新增右上角菜单的近期播放入口
+- 硬件解码失败时自动切换为应用解码器重试
+- 初始恢复音量上限支持自定义
+- 重新整理播放器、手势、音频和字幕设置分组
 
 <details>
 <summary>English Version</summary>
 
-- Add custom skip opening and ending settings
-- Add custom seek increments up to 120 seconds
-- Add video sharpening, disabled by default
-- Improve volume normalization with dynamic processing in the playback audio pipeline
-- Limit initial restored volume to 80% when remember volume is enabled
-- Fix inconsistent bottom rounding on the subtitle settings page
+- Add a recently played entry to the top-right menu
+- Automatically retry with app decoders when hardware decoding fails
+- Allow customizing the initial restored volume limit
+- Reorganize player, gesture, audio, and subtitle settings groups
 
 </details>
