@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import kotlin.time.Duration.Companion.milliseconds
+import one.next.player.core.model.ControlButtonsPosition
 import one.next.player.core.model.PlayerControl
 import one.next.player.core.model.PlayerControlZone
 import one.next.player.core.model.VideoContentScale
@@ -80,6 +81,7 @@ fun ControlsBottomView(
     player: Player,
     mediaPresentationState: MediaPresentationState,
     bottomLeftControls: List<PlayerControl>,
+    controlButtonsPosition: ControlButtonsPosition,
     videoContentScale: VideoContentScale,
     isPipSupported: Boolean,
     pendingSeekPosition: Long?,
@@ -204,7 +206,10 @@ fun ControlsBottomView(
                 true -> Alignment.Top
                 false -> Alignment.CenterVertically
             },
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = when (controlButtonsPosition) {
+                ControlButtonsPosition.LEFT -> Arrangement.spacedBy(8.dp, Alignment.Start)
+                ControlButtonsPosition.RIGHT -> Arrangement.spacedBy(8.dp, Alignment.End)
+            },
         ) {
             bottomLeftControls.forEach { control ->
                 if (!isCustomizingControls && control !in visiblePlayerControls) return@forEach

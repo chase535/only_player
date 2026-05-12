@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import one.next.player.core.common.Logger
+import one.next.player.core.common.extensions.round
 import one.next.player.core.data.repository.PreferencesRepository
 import one.next.player.core.model.DecoderPriority
 import one.next.player.core.model.PlayerPreferences
@@ -17,6 +19,10 @@ import one.next.player.core.model.PlayerPreferences
 class DecoderPreferencesViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
+
+    private companion object {
+        const val TAG = "DecoderPreferencesViewModel"
+    }
 
     private val uiStateInternal = MutableStateFlow(
         DecoderPreferencesUiState(
@@ -39,6 +45,12 @@ class DecoderPreferencesViewModel @Inject constructor(
         when (event) {
             is DecoderPreferencesUiEvent.ShowDialog -> showDialog(event.value)
             is DecoderPreferencesUiEvent.UpdateDecoderPriority -> updateDecoderPriority(event.value)
+            is DecoderPreferencesUiEvent.UpdateVideoBrightness -> updateVideoBrightness(event.value)
+            is DecoderPreferencesUiEvent.UpdateVideoContrast -> updateVideoContrast(event.value)
+            is DecoderPreferencesUiEvent.UpdateVideoSaturation -> updateVideoSaturation(event.value)
+            is DecoderPreferencesUiEvent.UpdateVideoHue -> updateVideoHue(event.value)
+            is DecoderPreferencesUiEvent.UpdateVideoGamma -> updateVideoGamma(event.value)
+            is DecoderPreferencesUiEvent.UpdateVideoSharpening -> updateVideoSharpening(event.value)
         }
     }
 
@@ -53,6 +65,46 @@ class DecoderPreferencesViewModel @Inject constructor(
             preferencesRepository.updatePlayerPreferences {
                 it.copy(decoderPriority = value)
             }
+        }
+    }
+
+    private fun updateVideoBrightness(value: Float) {
+        val normalizedValue = value.coerceIn(PlayerPreferences.MIN_VIDEO_BRIGHTNESS, PlayerPreferences.MAX_VIDEO_BRIGHTNESS).round(2)
+        updateVideoFilter("brightness=$normalizedValue") { it.copy(videoBrightness = normalizedValue) }
+    }
+
+    private fun updateVideoContrast(value: Float) {
+        val normalizedValue = value.coerceIn(PlayerPreferences.MIN_VIDEO_CONTRAST, PlayerPreferences.MAX_VIDEO_CONTRAST).round(2)
+        updateVideoFilter("contrast=$normalizedValue") { it.copy(videoContrast = normalizedValue) }
+    }
+
+    private fun updateVideoSaturation(value: Float) {
+        val normalizedValue = value.coerceIn(PlayerPreferences.MIN_VIDEO_SATURATION, PlayerPreferences.MAX_VIDEO_SATURATION).round(0)
+        updateVideoFilter("saturation=$normalizedValue") { it.copy(videoSaturation = normalizedValue) }
+    }
+
+    private fun updateVideoHue(value: Float) {
+        val normalizedValue = value.coerceIn(PlayerPreferences.MIN_VIDEO_HUE, PlayerPreferences.MAX_VIDEO_HUE).round(0)
+        updateVideoFilter("hue=$normalizedValue") { it.copy(videoHue = normalizedValue) }
+    }
+
+    private fun updateVideoGamma(value: Float) {
+        val normalizedValue = value.coerceIn(PlayerPreferences.MIN_VIDEO_GAMMA, PlayerPreferences.MAX_VIDEO_GAMMA).round(2)
+        updateVideoFilter("gamma=$normalizedValue") { it.copy(videoGamma = normalizedValue) }
+    }
+
+    private fun updateVideoSharpening(value: Float) {
+        val normalizedValue = value.coerceIn(PlayerPreferences.DEFAULT_VIDEO_SHARPENING, PlayerPreferences.MAX_VIDEO_SHARPENING).round(2)
+        updateVideoFilter("sharpening=$normalizedValue") { it.copy(videoSharpening = normalizedValue) }
+    }
+
+    private fun updateVideoFilter(
+        debugValue: String,
+        transform: (PlayerPreferences) -> PlayerPreferences,
+    ) {
+        Logger.debug(TAG, "Update video filter from settings: $debugValue")
+        viewModelScope.launch {
+            preferencesRepository.updatePlayerPreferences(transform)
         }
     }
 }
@@ -70,4 +122,10 @@ sealed interface DecoderPreferenceDialog {
 sealed interface DecoderPreferencesUiEvent {
     data class ShowDialog(val value: DecoderPreferenceDialog?) : DecoderPreferencesUiEvent
     data class UpdateDecoderPriority(val value: DecoderPriority) : DecoderPreferencesUiEvent
+    data class UpdateVideoBrightness(val value: Float) : DecoderPreferencesUiEvent
+    data class UpdateVideoContrast(val value: Float) : DecoderPreferencesUiEvent
+    data class UpdateVideoSaturation(val value: Float) : DecoderPreferencesUiEvent
+    data class UpdateVideoHue(val value: Float) : DecoderPreferencesUiEvent
+    data class UpdateVideoGamma(val value: Float) : DecoderPreferencesUiEvent
+    data class UpdateVideoSharpening(val value: Float) : DecoderPreferencesUiEvent
 }

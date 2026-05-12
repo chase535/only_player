@@ -199,11 +199,20 @@ private fun PlayerPreferencesContent(
                 )
             }
 
-            ListSectionTitle(text = stringResource(id = R.string.video_processing))
-            VideoFiltersSettings(
-                preferences = uiState.preferences,
-                onEvent = onEvent,
-            )
+            ListSectionTitle(text = stringResource(id = R.string.player_controls))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                ClickablePreferenceItem(
+                    modifier = Modifier.testTag("item_settings_control_buttons_alignment"),
+                    title = stringResource(id = R.string.control_buttons_alignment),
+                    description = uiState.preferences.controlButtonsPosition.name(),
+                    icon = NextIcons.ButtonsPosition,
+                    onClick = { onEvent(PlayerPreferencesUiEvent.ShowDialog(PlayerPreferenceDialog.ControlButtonsDialog)) },
+                    isFirstItem = true,
+                    isLastItem = true,
+                )
+            }
         }
 
         uiState.showDialog?.let { showDialog ->
@@ -246,149 +255,6 @@ private fun PlayerPreferencesContent(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun VideoFiltersSettings(
-    preferences: PlayerPreferences,
-    onEvent: (PlayerPreferencesUiEvent) -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-    ) {
-        PreferenceSlider(
-            modifier = Modifier.testTag("item_settings_video_brightness"),
-            sliderModifier = Modifier.testTag("slider_settings_video_brightness"),
-            title = stringResource(R.string.video_brightness),
-            description = signedPercent(preferences.videoBrightness),
-            icon = NextIcons.Sensitivity,
-            value = preferences.videoBrightness,
-            valueRange = PlayerPreferences.MIN_VIDEO_BRIGHTNESS..PlayerPreferences.MAX_VIDEO_BRIGHTNESS,
-            onValueChange = { onEvent(PlayerPreferencesUiEvent.UpdateVideoBrightness(it)) },
-            isFirstItem = true,
-            trailingContent = {
-                ResetVideoFilterButton(
-                    testTag = "btn_reset_settings_video_brightness",
-                    contentDescription = stringResource(id = R.string.reset_video_brightness),
-                    onClick = { onEvent(PlayerPreferencesUiEvent.UpdateVideoBrightness(PlayerPreferences.DEFAULT_VIDEO_BRIGHTNESS)) },
-                )
-            },
-        )
-        PreferenceSlider(
-            modifier = Modifier.testTag("item_settings_video_contrast"),
-            sliderModifier = Modifier.testTag("slider_settings_video_contrast"),
-            title = stringResource(R.string.video_contrast),
-            description = signedPercent(preferences.videoContrast),
-            icon = NextIcons.Sensitivity,
-            value = preferences.videoContrast,
-            valueRange = PlayerPreferences.MIN_VIDEO_CONTRAST..PlayerPreferences.MAX_VIDEO_CONTRAST,
-            onValueChange = { onEvent(PlayerPreferencesUiEvent.UpdateVideoContrast(it)) },
-            trailingContent = {
-                ResetVideoFilterButton(
-                    testTag = "btn_reset_settings_video_contrast",
-                    contentDescription = stringResource(id = R.string.reset_video_contrast),
-                    onClick = { onEvent(PlayerPreferencesUiEvent.UpdateVideoContrast(PlayerPreferences.DEFAULT_VIDEO_CONTRAST)) },
-                )
-            },
-        )
-        PreferenceSlider(
-            modifier = Modifier.testTag("item_settings_video_saturation"),
-            sliderModifier = Modifier.testTag("slider_settings_video_saturation"),
-            title = stringResource(R.string.video_saturation),
-            description = signedInteger(preferences.videoSaturation),
-            icon = NextIcons.Sensitivity,
-            value = preferences.videoSaturation,
-            valueRange = PlayerPreferences.MIN_VIDEO_SATURATION..PlayerPreferences.MAX_VIDEO_SATURATION,
-            onValueChange = { onEvent(PlayerPreferencesUiEvent.UpdateVideoSaturation(it)) },
-            trailingContent = {
-                ResetVideoFilterButton(
-                    testTag = "btn_reset_settings_video_saturation",
-                    contentDescription = stringResource(id = R.string.reset_video_saturation),
-                    onClick = { onEvent(PlayerPreferencesUiEvent.UpdateVideoSaturation(PlayerPreferences.DEFAULT_VIDEO_SATURATION)) },
-                )
-            },
-        )
-        PreferenceSlider(
-            modifier = Modifier.testTag("item_settings_video_hue"),
-            sliderModifier = Modifier.testTag("slider_settings_video_hue"),
-            title = stringResource(R.string.video_hue),
-            description = stringResource(R.string.degrees, preferences.videoHue.toInt()),
-            icon = NextIcons.Sensitivity,
-            value = preferences.videoHue,
-            valueRange = PlayerPreferences.MIN_VIDEO_HUE..PlayerPreferences.MAX_VIDEO_HUE,
-            onValueChange = { onEvent(PlayerPreferencesUiEvent.UpdateVideoHue(it)) },
-            trailingContent = {
-                ResetVideoFilterButton(
-                    testTag = "btn_reset_settings_video_hue",
-                    contentDescription = stringResource(id = R.string.reset_video_hue),
-                    onClick = { onEvent(PlayerPreferencesUiEvent.UpdateVideoHue(PlayerPreferences.DEFAULT_VIDEO_HUE)) },
-                )
-            },
-        )
-        PreferenceSlider(
-            modifier = Modifier.testTag("item_settings_video_gamma"),
-            sliderModifier = Modifier.testTag("slider_settings_video_gamma"),
-            title = stringResource(R.string.video_gamma),
-            description = String.format("%.2f", preferences.videoGamma),
-            icon = NextIcons.Sensitivity,
-            value = preferences.videoGamma,
-            valueRange = PlayerPreferences.MIN_VIDEO_GAMMA..PlayerPreferences.MAX_VIDEO_GAMMA,
-            onValueChange = { onEvent(PlayerPreferencesUiEvent.UpdateVideoGamma(it)) },
-            trailingContent = {
-                ResetVideoFilterButton(
-                    testTag = "btn_reset_settings_video_gamma",
-                    contentDescription = stringResource(id = R.string.reset_video_gamma),
-                    onClick = { onEvent(PlayerPreferencesUiEvent.UpdateVideoGamma(PlayerPreferences.DEFAULT_VIDEO_GAMMA)) },
-                )
-            },
-        )
-        PreferenceSlider(
-            modifier = Modifier.testTag("item_settings_video_sharpening"),
-            sliderModifier = Modifier.testTag("slider_settings_video_sharpening"),
-            title = stringResource(R.string.video_sharpening),
-            description = stringResource(R.string.percent, (preferences.videoSharpening * 100).toInt()),
-            icon = NextIcons.Sensitivity,
-            value = preferences.videoSharpening,
-            valueRange = PlayerPreferences.DEFAULT_VIDEO_SHARPENING..PlayerPreferences.MAX_VIDEO_SHARPENING,
-            onValueChange = { onEvent(PlayerPreferencesUiEvent.UpdateVideoSharpening(it)) },
-            isLastItem = true,
-            trailingContent = {
-                ResetVideoFilterButton(
-                    testTag = "btn_reset_settings_video_sharpening",
-                    contentDescription = stringResource(id = R.string.reset_video_sharpening),
-                    onClick = { onEvent(PlayerPreferencesUiEvent.UpdateVideoSharpening(PlayerPreferences.DEFAULT_VIDEO_SHARPENING)) },
-                )
-            },
-        )
-    }
-}
-
-@Composable
-private fun ResetVideoFilterButton(
-    testTag: String,
-    contentDescription: String,
-    onClick: () -> Unit,
-) {
-    FilledIconButton(
-        modifier = Modifier.testTag(testTag),
-        onClick = onClick,
-    ) {
-        Icon(
-            imageVector = NextIcons.History,
-            contentDescription = contentDescription,
-        )
-    }
-}
-
-private fun signedPercent(value: Float): String {
-    val percent = (value * 100).toInt()
-    return if (percent > 0) "+$percent%" else "$percent%"
-}
-
-private fun signedInteger(value: Float): String {
-    val rounded = value.toInt()
-    return if (rounded > 0) "+$rounded" else "$rounded"
 }
 
 @DayNightPreview

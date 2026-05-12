@@ -4,6 +4,7 @@ import androidx.annotation.OptIn
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutout
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import one.next.player.core.model.ControlButtonsPosition
 import one.next.player.core.model.PlayerControl
 import one.next.player.core.model.PlayerControlZone
 import one.next.player.core.model.VideoContentScale
@@ -48,6 +50,7 @@ fun ControlsTopView(
     title: String,
     player: Player,
     topRightControls: List<PlayerControl>,
+    controlButtonsPosition: ControlButtonsPosition,
     visiblePlayerControls: Set<PlayerControl>,
     videoContentScale: VideoContentScale,
     isPipSupported: Boolean,
@@ -82,30 +85,33 @@ fun ControlsTopView(
     onBackClick: () -> Unit,
 ) {
     val systemBarsPadding = WindowInsets.systemBars.union(WindowInsets.displayCutout).asPaddingValues()
-    Row(
-        modifier = modifier
-            .padding(systemBarsPadding.copy(bottom = 0.dp))
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        if (isBackVisible) {
-            PlayerButton(
-                onClick = onBackClick,
-                isSelected = isBackSelected,
-                label = stringResource(R.string.player_controls_exit).takeIf { isCustomizingControls },
-                shouldShowSelectionBadge = false,
-                shouldDimWhenUnselected = false,
-                shouldShowCustomizeFrame = false,
-                isInteractive = isBackInteractive,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_left),
-                    contentDescription = "btn_back",
-                )
-            }
+    val isLandscape = LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val maxVisibleCount = if (isLandscape) 6 else 4
+    val buttonSlotWidth = if (isCustomizingControls) 72.dp else 48.dp
+    val maxRowWidth = buttonSlotWidth * maxVisibleCount
+
+    @Composable
+    fun BackButton() {
+        if (!isBackVisible) return
+
+        PlayerButton(
+            onClick = onBackClick,
+            isSelected = isBackSelected,
+            label = stringResource(R.string.player_controls_exit).takeIf { isCustomizingControls },
+            shouldShowSelectionBadge = false,
+            shouldDimWhenUnselected = false,
+            shouldShowCustomizeFrame = false,
+            isInteractive = isBackInteractive,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_left),
+                contentDescription = "btn_back",
+            )
         }
+    }
+
+    @Composable
+    fun RowScope.Title() {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
@@ -114,13 +120,10 @@ fun ControlsTopView(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
+    }
 
-        // 竖屏最多 4 个按钮可见，横屏最多 6 个，超出可滚动
-        val isLandscape = LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
-        val maxVisibleCount = if (isLandscape) 6 else 4
-        val buttonSlotWidth = if (isCustomizingControls) 72.dp else 48.dp
-        val maxRowWidth = buttonSlotWidth * maxVisibleCount
-
+    @Composable
+    fun TopControls() {
         Row(
             modifier = Modifier
                 .widthIn(max = maxRowWidth)
@@ -182,6 +185,28 @@ fun ControlsTopView(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    Row(
+        modifier = modifier
+            .padding(systemBarsPadding.copy(bottom = 0.dp))
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        when (controlButtonsPosition) {
+            ControlButtonsPosition.LEFT -> {
+                BackButton()
+                Title()
+                TopControls()
+            }
+            ControlButtonsPosition.RIGHT -> {
+                TopControls()
+                Title()
+                BackButton()
             }
         }
     }

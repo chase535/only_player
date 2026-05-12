@@ -294,15 +294,19 @@ internal enum class SettingRow(
         ),
     ),
     DECODER(
-        titleResId = R.string.decoder,
+        titleResId = R.string.video_processing,
         descriptionResId = R.string.decoder_desc,
         icon = NextIcons.Decoder,
         setting = Setting.DECODER,
         subSettingResIds = listOf(
             R.string.decoder_priority,
-            R.string.video_software_decoders,
-            R.string.prefer_device_decoders,
-            R.string.prefer_app_decoders,
+            R.string.video_filters,
+            R.string.video_brightness,
+            R.string.video_contrast,
+            R.string.video_saturation,
+            R.string.video_hue,
+            R.string.video_gamma,
+            R.string.video_sharpening,
         ),
     ),
     AUDIO(
