@@ -1,14 +1,16 @@
-- 支持将播放器外侧控制按钮在左右两侧之间切换
-- 将视频滤镜设置归入画面处理页面，和解码器优先级集中管理
-- 让设置列表首尾项目圆角跟随设备屏幕圆角
-- 更新 Media3 到 1.10.1
+- 恢复视频锐化滤镜的即时预览和播放效果
+- 新增应用日志页面，支持查看、复制、清空和导出日志
+- 记录云端文件访问失败并减少可恢复错误导致的崩溃
+- 扩展普通字幕样式自定义，支持字体、粗体、字号、背景、颜色、边缘样式和位置调节
+- 在播放器字幕面板中直接调整普通字幕外观
 
 <details>
 <summary>English Version</summary>
 
-- Support switching the outer player control buttons between the left and right sides
-- Move video filter settings into the video processing page alongside decoder priority
-- Match the first and last setting list item corners to the device screen corners
-- Update Media3 to 1.10.1
+- Restore instant preview and playback effects for the video sharpening filter
+- Add an app logs page with viewing, copying, clearing, and exporting support
+- Log cloud file access failures and reduce crashes from recoverable errors
+- Expand plain subtitle style customization with font, bold text, size, background, color, edge style, and position controls
+- Adjust plain subtitle appearance directly from the player subtitle panel
 
 </details>
