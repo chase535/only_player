@@ -118,6 +118,9 @@
     <string name="landscape_reverse">横向反转</string>
     <string name="player_screen_orientation">播放器屏幕方向</string>
     <string name="video_orientation">视频方向</string>
+    <string name="ambience_mode">氛围模式</string>
+    <string name="remember_player_screen_orientation">记住旋转方向</string>
+    <string name="remember_player_screen_orientation_description">播放开始时使用上次手动选择的方向</string>
     <string name="landscape_auto">横向（传感器）</string>
     <string name="newest">最新</string>
     <string name="oldest">最旧</string>

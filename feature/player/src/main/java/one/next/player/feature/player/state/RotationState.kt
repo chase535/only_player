@@ -19,7 +19,9 @@ import androidx.core.util.Consumer
 import androidx.media3.common.Player
 import androidx.media3.common.listen
 import androidx.media3.common.util.UnstableApi
+import one.next.player.core.model.LastPlayerScreenOrientation
 import one.next.player.core.model.ScreenOrientation
+import one.next.player.feature.player.extensions.toActivityOrientation
 import one.next.player.feature.player.extensions.videoHeight
 import one.next.player.feature.player.extensions.videoRotation
 import one.next.player.feature.player.extensions.videoWidth
@@ -29,18 +31,24 @@ import one.next.player.feature.player.extensions.videoWidth
 fun rememberRotationState(
     player: Player,
     screenOrientation: ScreenOrientation,
+    shouldRememberScreenOrientation: Boolean,
+    lastScreenOrientation: LastPlayerScreenOrientation?,
+    onLastScreenOrientationChange: (LastPlayerScreenOrientation) -> Unit,
 ): RotationState {
     val activity = LocalActivity.current as ComponentActivity
-    val rotationState = remember(screenOrientation) {
+    val rotationState = remember(screenOrientation, shouldRememberScreenOrientation, lastScreenOrientation) {
         RotationState(
             activity = activity,
             screenOrientation = screenOrientation,
+            shouldRememberScreenOrientation = shouldRememberScreenOrientation,
+            lastScreenOrientation = lastScreenOrientation,
+            onLastScreenOrientationChange = onLastScreenOrientationChange,
         )
     }
-    DisposableEffect(activity) {
+    DisposableEffect(activity, rotationState) {
         rotationState.handleListeners(this)
     }
-    LaunchedEffect(player) { rotationState.observe(player) }
+    LaunchedEffect(player, rotationState) { rotationState.observe(player) }
     return rotationState
 }
 
@@ -48,14 +56,21 @@ fun rememberRotationState(
 class RotationState(
     private val activity: ComponentActivity,
     private val screenOrientation: ScreenOrientation,
+    private val shouldRememberScreenOrientation: Boolean,
+    private val lastScreenOrientation: LastPlayerScreenOrientation?,
+    private val onLastScreenOrientationChange: (LastPlayerScreenOrientation) -> Unit,
 ) {
     var currentRequestedOrientation: Int by mutableIntStateOf(activity.requestedOrientation)
         private set
 
     fun rotate() {
-        activity.requestedOrientation = when (activity.resources.configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        val newOrientation = when (activity.resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> LastPlayerScreenOrientation.PORTRAIT
+            else -> LastPlayerScreenOrientation.LANDSCAPE
+        }
+        activity.requestedOrientation = newOrientation.toActivityOrientation()
+        if (shouldRememberScreenOrientation) {
+            onLastScreenOrientationChange(newOrientation)
         }
     }
 
@@ -92,6 +107,7 @@ class RotationState(
 
     private fun maybeApplyVideoOrientation(player: Player) {
         if (screenOrientation != ScreenOrientation.VIDEO_ORIENTATION) return
+        if (shouldRememberScreenOrientation && lastScreenOrientation != null) return
         val orientation = getVideoBasedOrientation(player)
         if (orientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
             Log.d(TAG, "applyOrientation: $orientation")
@@ -101,8 +117,12 @@ class RotationState(
 
     private fun setOrientation(player: Player) {
         Log.d(TAG, "setOrientation: requestedOrientation=${activity.requestedOrientation}")
-        if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
-            activity.requestedOrientation = when (screenOrientation) {
+        if (activity.requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) return
+
+        activity.requestedOrientation = lastScreenOrientation
+            ?.takeIf { shouldRememberScreenOrientation }
+            ?.toActivityOrientation()
+            ?: when (screenOrientation) {
                 ScreenOrientation.AUTOMATIC -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
                 ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 ScreenOrientation.LANDSCAPE_REVERSE -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
@@ -110,7 +130,6 @@ class RotationState(
                 ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
                 ScreenOrientation.VIDEO_ORIENTATION -> getVideoBasedOrientation(player)
             }
-        }
     }
 
     private fun getVideoBasedOrientation(player: Player): Int {

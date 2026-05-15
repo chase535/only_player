@@ -45,6 +45,7 @@ class PlayerPreferencesViewModel @Inject constructor(
             PlayerPreferencesUiEvent.ToggleAutoPip -> toggleAutoPip()
             PlayerPreferencesUiEvent.ToggleAutoBackgroundPlay -> toggleAutoBackgroundPlay()
             PlayerPreferencesUiEvent.ToggleRememberBrightnessLevel -> toggleRememberBrightnessLevel()
+            PlayerPreferencesUiEvent.ToggleRememberPlayerScreenOrientation -> toggleRememberPlayerScreenOrientation()
             is PlayerPreferencesUiEvent.UpdatePreferredPlayerOrientation -> updatePreferredPlayerOrientation(event.value)
             is PlayerPreferencesUiEvent.UpdatePreferredControlButtonsPosition -> updatePreferredControlButtonsPosition(event.value)
             is PlayerPreferencesUiEvent.UpdateDefaultPlaybackSpeed -> updateDefaultPlaybackSpeed(event.value)
@@ -108,7 +109,18 @@ class PlayerPreferencesViewModel @Inject constructor(
     private fun updatePreferredPlayerOrientation(value: ScreenOrientation) {
         viewModelScope.launch {
             preferencesRepository.updatePlayerPreferences {
-                it.copy(playerScreenOrientation = value)
+                it.copy(
+                    playerScreenOrientation = value,
+                    lastPlayerScreenOrientation = null,
+                )
+            }
+        }
+    }
+
+    private fun toggleRememberPlayerScreenOrientation() {
+        viewModelScope.launch {
+            preferencesRepository.updatePlayerPreferences {
+                it.copy(shouldRememberPlayerScreenOrientation = !it.shouldRememberPlayerScreenOrientation)
             }
         }
     }
@@ -172,6 +184,7 @@ sealed interface PlayerPreferencesUiEvent {
     data object ToggleAutoPip : PlayerPreferencesUiEvent
     data object ToggleAutoBackgroundPlay : PlayerPreferencesUiEvent
     data object ToggleRememberBrightnessLevel : PlayerPreferencesUiEvent
+    data object ToggleRememberPlayerScreenOrientation : PlayerPreferencesUiEvent
     data class UpdatePreferredPlayerOrientation(val value: ScreenOrientation) : PlayerPreferencesUiEvent
     data class UpdatePreferredControlButtonsPosition(val value: ControlButtonsPosition) : PlayerPreferencesUiEvent
     data class UpdateDefaultPlaybackSpeed(val value: Float) : PlayerPreferencesUiEvent

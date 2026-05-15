@@ -8,3 +8,8 @@ enum class ScreenOrientation {
     PORTRAIT,
     VIDEO_ORIENTATION,
 }
+
+enum class LastPlayerScreenOrientation {
+    PORTRAIT,
+    LANDSCAPE,
+}

@@ -41,6 +41,8 @@ internal fun PlayerCustomizableControlButton(
     onLockControlsClick: () -> Unit,
     onVideoContentScaleClick: () -> Unit,
     onVideoContentScaleLongClick: () -> Unit,
+    onAmbienceModeClick: () -> Unit,
+    isAmbienceModeEnabled: Boolean,
     onVideoFiltersClick: () -> Unit,
     onPictureInPictureClick: () -> Unit,
     onRotateClick: () -> Unit,
@@ -148,6 +150,21 @@ internal fun PlayerCustomizableControlButton(
                 Icon(
                     painter = painterResource(videoContentScale.drawableRes()),
                     contentDescription = "btn_scale",
+                )
+            }
+        }
+
+        PlayerControl.AMBIENCE_MODE -> {
+            PlayerButton(
+                modifier = buttonModifier,
+                onClick = onAmbienceModeClick,
+                isSelected = if (isCustomizingControls) isSelected else isAmbienceModeEnabled,
+                label = label,
+                isOutlineOnly = isPlaceholder,
+            ) {
+                Icon(
+                    imageVector = NextIcons.Background,
+                    contentDescription = "btn_ambience_mode",
                 )
             }
         }
@@ -302,6 +319,7 @@ private fun PlayerControl.label(): String = when (this) {
     PlayerControl.SUBTITLE -> stringResource(R.string.subtitle)
     PlayerControl.LOCK -> stringResource(R.string.controls_lock)
     PlayerControl.SCALE -> stringResource(R.string.video_zoom)
+    PlayerControl.AMBIENCE_MODE -> stringResource(R.string.ambience_mode)
     PlayerControl.VIDEO_FILTERS -> stringResource(R.string.video_filters)
     PlayerControl.PIP -> stringResource(R.string.pip_settings)
     PlayerControl.SCREENSHOT -> stringResource(R.string.take_screenshot)

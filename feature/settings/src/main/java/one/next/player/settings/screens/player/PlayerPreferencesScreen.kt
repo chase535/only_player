@@ -120,6 +120,14 @@ private fun PlayerPreferencesContent(
                     },
                 )
                 PreferenceSwitch(
+                    modifier = Modifier.testTag("item_settings_remember_player_screen_orientation"),
+                    title = stringResource(id = R.string.remember_player_screen_orientation),
+                    description = stringResource(id = R.string.remember_player_screen_orientation_description),
+                    icon = NextIcons.History,
+                    isChecked = uiState.preferences.shouldRememberPlayerScreenOrientation,
+                    onClick = { onEvent(PlayerPreferencesUiEvent.ToggleRememberPlayerScreenOrientation) },
+                )
+                PreferenceSwitch(
                     modifier = Modifier.testTag("item_settings_classic_player_icons"),
                     title = stringResource(id = R.string.enable_classic_player_icons),
                     description = stringResource(id = R.string.enable_classic_player_icons_description),

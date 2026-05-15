@@ -186,6 +186,9 @@
     <string name="z_a">Z-A</string>
     <string name="decoder_desc">解碼器優先等級、影片濾鏡選項</string>
     <string name="video_orientation">影片方向</string>
+    <string name="ambience_mode">氛圍模式</string>
+    <string name="remember_player_screen_orientation">記住旋轉方向</string>
+    <string name="remember_player_screen_orientation_description">播放開始時使用上次手動選擇的方向</string>
     <string name="best_fit">最適合</string>
     <string name="about_name">關於</string>
     <string name="subtitle">字幕</string>

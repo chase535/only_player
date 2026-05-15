@@ -1,6 +1,7 @@
 package one.next.player.feature.player
 
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -10,6 +11,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,11 +52,14 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -208,6 +213,9 @@ internal fun MediaPlayerScreen(
     val rotationState = rememberRotationState(
         player = player,
         screenOrientation = playerPreferences.playerScreenOrientation,
+        shouldRememberScreenOrientation = playerPreferences.shouldRememberPlayerScreenOrientation,
+        lastScreenOrientation = playerPreferences.lastPlayerScreenOrientation,
+        onLastScreenOrientationChange = viewModel::updateLastPlayerScreenOrientation,
     )
     var restoredVolumeMediaItemIndex by remember { mutableIntStateOf(Int.MIN_VALUE) }
     var lastSavedVolumePercentage by remember { mutableIntStateOf(volumeState.volumePercentage) }
@@ -303,6 +311,7 @@ internal fun MediaPlayerScreen(
     var shouldShowOverlay by remember { mutableStateOf(false) }
     var isSleepTimerDialogShown by remember { mutableStateOf(false) }
     var videoFiltersInitialPreferences by remember { mutableStateOf<PlayerPreferences?>(null) }
+    var isAmbienceModeEnabled by remember { mutableStateOf(false) }
     val videoFiltersUnavailableMessage = stringResource(coreUiR.string.video_filters_unavailable_software_decoder)
     fun restoreVideoFiltersPreview() {
         videoFiltersInitialPreferences?.let { initialPreferences ->
@@ -562,6 +571,9 @@ internal fun MediaPlayerScreen(
                     .fillMaxSize()
                     .background(Color.Black),
             ) {
+                if (isAmbienceModeEnabled) {
+                    AmbienceBackground(artworkData = metadataState.artworkData)
+                }
                 val safeDrawingTopPadding = WindowInsets.safeDrawing
                     .asPaddingValues()
                     .calculateTopPadding()
@@ -743,6 +755,15 @@ internal fun MediaPlayerScreen(
                                             overlayView = OverlayView.VIDEO_CONTENT_SCALE
                                         }
                                     },
+                                    onAmbienceModeClick = {
+                                        if (isCustomizingControls) {
+                                            toggleControlVisibility(PlayerControl.AMBIENCE_MODE)
+                                        } else {
+                                            isAmbienceModeEnabled = !isAmbienceModeEnabled
+                                            controlsVisibilityState.showControls()
+                                        }
+                                    },
+                                    isAmbienceModeEnabled = isAmbienceModeEnabled,
                                     onVideoFiltersClick = {
                                         if (isCustomizingControls) {
                                             toggleControlVisibility(PlayerControl.VIDEO_FILTERS)
@@ -928,6 +949,15 @@ internal fun MediaPlayerScreen(
                                             overlayView = OverlayView.VIDEO_CONTENT_SCALE
                                         }
                                     },
+                                    onAmbienceModeClick = {
+                                        if (isCustomizingControls) {
+                                            toggleControlVisibility(PlayerControl.AMBIENCE_MODE)
+                                        } else {
+                                            isAmbienceModeEnabled = !isAmbienceModeEnabled
+                                            controlsVisibilityState.showControls()
+                                        }
+                                    },
+                                    isAmbienceModeEnabled = isAmbienceModeEnabled,
                                     onVideoFiltersClick = {
                                         if (isCustomizingControls) {
                                             toggleControlVisibility(PlayerControl.VIDEO_FILTERS)
@@ -976,6 +1006,8 @@ internal fun MediaPlayerScreen(
                                 onLockControlsClick = { },
                                 onVideoContentScaleClick = { },
                                 onVideoContentScaleLongClick = { },
+                                onAmbienceModeClick = { },
+                                isAmbienceModeEnabled = isAmbienceModeEnabled,
                                 onVideoFiltersClick = { },
                                 onPictureInPictureClick = { },
                                 onRotateClick = { },
@@ -1120,6 +1152,34 @@ fun InfoView(
             textAlign = TextAlign.Center,
         )
     }
+}
+
+@Composable
+private fun AmbienceBackground(
+    artworkData: ByteArray?,
+    modifier: Modifier = Modifier,
+) {
+    artworkData ?: return
+    val imageBitmap = remember(artworkData) {
+        runCatching {
+            BitmapFactory.decodeByteArray(artworkData, 0, artworkData.size).asImageBitmap()
+        }.getOrNull()
+    } ?: return
+
+    Image(
+        bitmap = imageBitmap,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+            .fillMaxSize()
+            .blur(72.dp),
+        alpha = 0.55f,
+    )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.62f)),
+    )
 }
 
 @Composable

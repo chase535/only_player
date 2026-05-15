@@ -78,6 +78,7 @@ import one.next.player.feature.player.extensions.OpenDocumentWithInitialUri
 import one.next.player.feature.player.extensions.copy
 import one.next.player.feature.player.extensions.registerForSuspendActivityResult
 import one.next.player.feature.player.extensions.setExtras
+import one.next.player.feature.player.extensions.toActivityOrientation
 import one.next.player.feature.player.extensions.uriToSubtitleConfiguration
 import one.next.player.feature.player.service.PlayerService
 import one.next.player.feature.player.service.addSubtitleTrack
@@ -840,6 +841,13 @@ class PlayerActivity : AppCompatActivity() {
     // 在 controller 连接前根据数据库预设方向，避免竖屏闪烁
     private fun presetVideoOrientation() {
         val prefs = playerPreferences ?: return
+        val rememberedOrientation = prefs.lastPlayerScreenOrientation
+            ?.takeIf { prefs.shouldRememberPlayerScreenOrientation }
+            ?.toActivityOrientation()
+        if (rememberedOrientation != null) {
+            requestedOrientation = rememberedOrientation
+            return
+        }
         if (prefs.playerScreenOrientation != ScreenOrientation.VIDEO_ORIENTATION) return
         val uri = intent.data ?: return
         lifecycleScope.launch(Dispatchers.IO) {

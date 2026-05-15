@@ -23,6 +23,9 @@ class MetadataState(private val player: Player) {
     var title: String? by mutableStateOf(null)
         private set
 
+    var artworkData: ByteArray? by mutableStateOf(null)
+        private set
+
     var isVideoEffectsAvailable: Boolean by mutableStateOf(true)
         private set
 
@@ -42,6 +45,7 @@ class MetadataState(private val player: Player) {
 
     private fun updateFromPlayer() {
         title = player.mediaMetadata.title?.toString()
+        artworkData = player.mediaMetadata.artworkData
         isVideoEffectsAvailable = player.mediaMetadata.isVideoEffectsAvailable
     }
 }

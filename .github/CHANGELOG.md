@@ -1,10 +1,10 @@
-- 改进经典三键导航下的底部留白，媒体库、搜索、播放器、云盘、日志和崩溃页面不再贴住导航栏
-- 改进系统导航栏颜色，主页、设置页、播放器和崩溃页会跟随当前页面背景
+- 添加氛围模式，可在当前播放会话中显示类似 YouTube 的模糊背景效果
+- 添加记住旋转方向开关，播放器可在下次播放时恢复上次手动选择的方向
 
 <details>
 <summary>English Version</summary>
 
-- Improve bottom spacing with classic three-button navigation so media library, search, player, cloud, logs, and crash screens no longer touch the navigation bar
-- Improve system navigation bar colors so home, settings, player, and crash screens follow the current page background
+- Add ambience mode to show a YouTube-like blurred background effect during the current playback session
+- Add a remember rotation option so the player can restore the last manually selected orientation on the next playback
 
 </details>

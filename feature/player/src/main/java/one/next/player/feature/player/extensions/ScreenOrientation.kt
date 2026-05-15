@@ -1,7 +1,13 @@
 package one.next.player.feature.player.extensions
 
 import android.content.pm.ActivityInfo
+import one.next.player.core.model.LastPlayerScreenOrientation
 import one.next.player.core.model.ScreenOrientation
+
+fun LastPlayerScreenOrientation.toActivityOrientation(): Int = when (this) {
+    LastPlayerScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+    LastPlayerScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+}
 
 fun ScreenOrientation.toActivityOrientation(videoOrientation: Int? = null): Int = when (this) {
     ScreenOrientation.AUTOMATIC -> ActivityInfo.SCREEN_ORIENTATION_SENSOR

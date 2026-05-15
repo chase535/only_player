@@ -20,6 +20,7 @@ import one.next.player.core.data.repository.SubtitleFontRepository
 import one.next.player.core.data.repository.buildRemotePlaybackStateKey
 import one.next.player.core.domain.GetSortedPlaylistUseCase
 import one.next.player.core.model.ApplicationPreferences
+import one.next.player.core.model.LastPlayerScreenOrientation
 import one.next.player.core.model.LoopMode
 import one.next.player.core.model.PlayerControl
 import one.next.player.core.model.PlayerControlsLayout
@@ -116,6 +117,15 @@ class PlayerViewModel @Inject constructor(
             Logger.debug(TAG, "Remember player volume: percentage=$clampedPercentage")
             preferencesRepository.updatePlayerPreferences {
                 it.copy(playerVolumePercentage = clampedPercentage)
+            }
+        }
+    }
+
+    fun updateLastPlayerScreenOrientation(value: LastPlayerScreenOrientation) {
+        viewModelScope.launch {
+            preferencesRepository.updatePlayerPreferences { preferences ->
+                if (!preferences.shouldRememberPlayerScreenOrientation) return@updatePlayerPreferences preferences
+                preferences.copy(lastPlayerScreenOrientation = value)
             }
         }
     }
