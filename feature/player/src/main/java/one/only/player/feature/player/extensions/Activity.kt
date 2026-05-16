@@ -23,11 +23,10 @@ fun Activity.toggleSystemBars(shouldShowBars: Boolean, @Type.InsetsType types: I
 fun Activity.togglePlayerSystemBars(shouldShowControls: Boolean) {
     WindowCompat.getInsetsController(window, window.decorView).apply {
         systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        hide(WindowInsetsCompat.Type.statusBars())
         if (shouldShowControls) {
-            show(WindowInsetsCompat.Type.navigationBars())
+            show(WindowInsetsCompat.Type.systemBars())
         } else {
-            hide(WindowInsetsCompat.Type.navigationBars())
+            hide(WindowInsetsCompat.Type.systemBars())
         }
     }
 }
