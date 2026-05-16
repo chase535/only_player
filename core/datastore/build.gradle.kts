@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "one.next.player.core.datastore"
+    namespace = "one.only.player.core.datastore"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {

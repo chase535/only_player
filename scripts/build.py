@@ -232,8 +232,8 @@ def build_apk(args: argparse.Namespace) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="one-player-build",
-        description="Build One Player APKs and copy them into build/apk with release-ready names.",
+        prog="only-player-build",
+        description="Build Only Player APKs and copy them into build/apk with release-ready names.",
         epilog="Example: python scripts/build.py build-apk --abi arm64-v8a",
     )
     sub = parser.add_subparsers(dest="command", required=True)

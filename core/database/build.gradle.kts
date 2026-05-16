@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "one.next.player.core.database"
+    namespace = "one.only.player.core.database"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {

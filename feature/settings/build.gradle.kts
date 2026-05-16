@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "one.next.player.feature.settings"
+    namespace = "one.only.player.feature.settings"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {

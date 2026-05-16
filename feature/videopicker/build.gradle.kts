@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "one.next.player.feature.videopicker"
+    namespace = "one.only.player.feature.videopicker"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {

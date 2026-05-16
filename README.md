@@ -1,6 +1,6 @@
 <div align="center">
 
-# One Player
+# Only Player
 
 **A modern Android video player for local media**
 
@@ -179,8 +179,8 @@ feature/videopicker/  Media library browsing, search, quick settings
 ### Step 1: Clone and Open
 
 ```bash
-git clone https://github.com/Kindness-Kismet/One-Player.git
-cd One-Player
+git clone https://github.com/Kindness-Kismet/only_player.git
+cd only_player
 ```
 
 Open the project in Android Studio, let Gradle sync, and confirm JDK 25 is selected.
@@ -193,16 +193,15 @@ Open the project in Android Studio, let Gradle sync, and confirm JDK 25 is selec
 
 Install one of these outputs:
 
-- `app/build/outputs/apk/debug/app-universal-debug.apk`
-- `app/build/outputs/apk/debug/app-arm64-v8a-debug.apk`
-- `app/build/outputs/apk/debug/app-x86_64-debug.apk`
+- `build/apk/Only-Player-debug-arm64-v8a-<version>.apk`
+- `build/apk/Only-Player-debug-x86_64-<version>.apk`
 
 ### Step 3: Navigate the Codebase
 
 Recommended reading order:
 
 1. `README.md`
-2. `app/src/main/java/one/next/player/MainActivity.kt`
+2. `app/src/main/java/one/only/player/MainActivity.kt`
 3. `feature/videopicker/`
 4. `feature/player/`
 5. `feature/settings/`

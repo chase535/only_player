@@ -22,7 +22,7 @@ dependencyResolutionManagement {
 }
 
 
-rootProject.name = "OnePlayer"
+rootProject.name = "OnlyPlayer"
 
 include(":app")
 include(":core:common")

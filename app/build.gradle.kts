@@ -15,13 +15,13 @@ val configuredAbiFilter = providers.gradleProperty("abiFilter").orNull
     .orEmpty()
 
 android {
-    namespace = "one.next.player"
+    namespace = "one.only.player"
 
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        applicationId = "one.next.player"
+        applicationId = "one.only.player"
         versionCode = 80
         versionName = "1.0.79"
     }

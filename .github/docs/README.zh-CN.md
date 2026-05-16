@@ -1,6 +1,6 @@
 <div align="center">
 
-# One Player
+# Only Player
 
 **现代化的 Android 本地视频播放器**
 
@@ -179,8 +179,8 @@ feature/videopicker/  媒体浏览、搜索、快捷设置
 ### 第一步：克隆并打开项目
 
 ```bash
-git clone https://github.com/Kindness-Kismet/One-Player.git
-cd One-Player
+git clone https://github.com/Kindness-Kismet/Only-Player.git
+cd Only-Player
 ```
 
 用 Android Studio 打开项目，并确认使用 JDK 25。

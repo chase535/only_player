@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.OnePlayer.Splash" parent="Theme.SplashScreen">
+    <style name="Theme.OnlyPlayer.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
         <item name="windowSplashScreenBackground">#171B1C</item>
-        <item name="postSplashScreenTheme">@style/Theme.OnePlayer</item>
+        <item name="postSplashScreenTheme">@style/Theme.OnlyPlayer</item>
     </style>
 
-    <style name="Theme.OnePlayer.Splash.Light" parent="Theme.OnePlayer.Splash">
+    <style name="Theme.OnlyPlayer.Splash.Light" parent="Theme.OnlyPlayer.Splash">
         <item name="windowSplashScreenBackground">#F7F6FB</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="Theme.OnePlayer.Splash.Dark" parent="Theme.OnePlayer.Splash">
+    <style name="Theme.OnlyPlayer.Splash.Dark" parent="Theme.OnlyPlayer.Splash">
         <item name="windowSplashScreenBackground">#171B1C</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
     </style>
 
-    <style name="Theme.OnePlayer" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar" />
+    <style name="Theme.OnlyPlayer" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar" />
 </resources>
