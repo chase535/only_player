@@ -1,12 +1,10 @@
-- 推出全新的现代播放器布局，菜单式入口加上更纤细的进度条圆点，首次启动默认使用
-- 把睡眠定时器和解码器选择改成侧边面板，不再用对话框挡住画面
-- 修复缩放或平移视频时画中画偶发的系统限频崩溃
+- 项目说明：issues 不是许愿池，这是免费项目，恕难满足所有人的需求，请勿过度期待，市面上有不少替代品可以选择
+- 调整现代播放器布局：旋转图标尺寸与其它按钮统一，进度条收窄并改用圆点滑块，视频缩放面板不再重复显示滤镜入口，布局选项中"现代"放到了前面
 
 <details>
 <summary>English Version</summary>
 
-- Introduce the new modern player layout with a menu entry and a slimmer dotted seekbar, used by default on first launch
-- Switch the sleep timer and decoder pickers to side panels so they no longer block the video
-- Fix an occasional crash from the system rate-limiting picture-in-picture updates while zooming or panning the video
+- A note: issues are for feedback, not a wishlist. This is a free project and won't address every request — please keep expectations reasonable, and there are plenty of alternatives out there
+- Refine the modern player layout: align the rotate icon with the other buttons, slim down the seekbar with a dot thumb, drop the duplicate filters shortcut from the scale panel, and put "Modern" first in the layout picker
 
 </details>
