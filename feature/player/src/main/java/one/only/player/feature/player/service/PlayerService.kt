@@ -67,7 +67,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.github.anilbeesetti.nextlib.media3ext.renderer.subtitleDelayMilliseconds
 import io.github.anilbeesetti.nextlib.media3ext.renderer.subtitleSpeed
 import io.github.peerless2012.ass.media.AssHandler
-import io.github.peerless2012.ass.media.extractor.AssMatroskaExtractor
 import io.github.peerless2012.ass.media.kt.withAssSupport
 import io.github.peerless2012.ass.media.parser.AssSubtitleParserFactory
 import io.github.peerless2012.ass.media.type.AssRenderType
@@ -148,6 +147,7 @@ import one.only.player.feature.player.extensions.switchTrack
 import one.only.player.feature.player.extensions.uriToSubtitleConfiguration
 import one.only.player.feature.player.extensions.videoZoom
 import one.only.player.feature.player.subtitle.AssHandlerRegistry
+import one.only.player.feature.player.subtitle.NormalizingAssMatroskaExtractor
 import one.only.player.feature.player.subtitle.OnlineSubtitleRepository
 
 @OptIn(UnstableApi::class)
@@ -947,7 +947,7 @@ class PlayerService : MediaSessionService() {
             val extractors = baseFactory.createExtractors()
             for (i in extractors.indices) {
                 if (extractors[i] is MatroskaExtractor) {
-                    extractors[i] = AssMatroskaExtractor(
+                    extractors[i] = NormalizingAssMatroskaExtractor(
                         assSubtitleParserFactory,
                         assHandler,
                     ).also { extractor ->
@@ -2500,7 +2500,7 @@ class PlayerService : MediaSessionService() {
         val extractors = baseFactory.createExtractors()
         for (i in extractors.indices) {
             if (extractors[i] is MatroskaExtractor) {
-                val assExtractor = AssMatroskaExtractor(assSubtitleParserFactory, assHandler!!)
+                val assExtractor = NormalizingAssMatroskaExtractor(assSubtitleParserFactory, assHandler!!)
                 disableSeekForCues(assExtractor)
                 extractors[i] = SeekMapInjectingExtractor(assExtractor, seekMap)
             }

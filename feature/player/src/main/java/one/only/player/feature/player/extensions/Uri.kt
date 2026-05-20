@@ -51,7 +51,7 @@ suspend fun Context.uriToSubtitleConfiguration(
     val subtitleUri = normalizeAssFonts(uri = utf8ConvertedUri, label = label, mimeType = mimeType)
     Logger.debug(
         "SubtitleConfig",
-        "uri=$uri, convertedUri=$utf8ConvertedUri, subtitleUri=$subtitleUri, mime=$mimeType, label=$label",
+        "source=${uri.toSubtitleLogSummary()}, converted=${utf8ConvertedUri.toSubtitleLogSummary()}, subtitle=${subtitleUri.toSubtitleLogSummary()}, mime=$mimeType",
     )
     return MediaItem.SubtitleConfiguration.Builder(subtitleUri).apply {
         setId(uri.toString())
@@ -74,7 +74,7 @@ private suspend fun Context.normalizeAssFonts(
             val sourceText = contentResolver.openInputStream(uri)?.use { inputStream ->
                 inputStream.reader(StandardCharsets.UTF_8).readText()
             } ?: return@withContext uri
-            val normalizedText = sourceText.normalizeAssFonts()
+            val normalizedText = sourceText.normalizeAssSubtitleText()
             if (normalizedText == sourceText) return@withContext uri
 
             val file = File(subtitleCacheDir, normalizedAssFontFileName(label = label, uri = uri))
@@ -87,7 +87,7 @@ private suspend fun Context.normalizeAssFonts(
     }
 }
 
-private fun String.normalizeAssFonts(): String {
+internal fun String.normalizeAssSubtitleText(): String {
     val lineSeparator = detectLineSeparator()
     var section = AssSection.Other
     var styleFontNameIndex: Int? = null
@@ -163,14 +163,19 @@ private fun String.normalizeAssEventText(textIndex: Int): String {
     if (headerEndIndex < 0) return this
 
     val prefix = substring(0, headerEndIndex + 1)
-    val fields = substring(headerEndIndex + 1).split(',', limit = textIndex + 2).toMutableList()
+    return prefix + substring(headerEndIndex + 1).normalizeAssDialogueFields(textIndex)
+}
+
+internal fun String.normalizeAssDialogueFields(textIndex: Int): String {
+    val fields = split(',', limit = textIndex + 1).toMutableList()
     if (textIndex !in fields.indices) return this
 
-    fields[textIndex] = fields[textIndex]
-        .normalizeAssInlineFonts()
-        .widenLatinSpaces()
-    return prefix + fields.joinToString(",")
+    fields[textIndex] = fields[textIndex].normalizeAssDialogueText()
+    return fields.joinToString(",")
 }
+
+internal fun String.normalizeAssDialogueText(): String = normalizeAssInlineFonts()
+    .widenLatinSpaces()
 
 private fun String.normalizeAssInlineFonts(): String = ASS_INLINE_FONT_REGEX.replace(this) { match ->
     val fontName = match.groupValues[1].trim()
@@ -190,8 +195,8 @@ private fun String.widenLatinSpaces(): String = buildString(length) {
             '}' -> isInOverrideBlock = false
         }
         if (char == ' ' && !isInOverrideBlock && hasLatinNeighbor(index)) {
-            append(' ')
             append(' ')
+            append(' ')
         } else {
             append(char)
         }
@@ -229,6 +234,12 @@ private fun normalizedAssFontFileName(label: String, uri: Uri): String {
     val extension = label.substringAfterLast('.', missingDelimiterValue = "ass")
     val cacheKey = uri.toString().hashCode().toUInt().toString(radix = 16)
     return "$baseName-$cacheKey.ass-font.$extension"
+}
+
+private fun Uri.toSubtitleLogSummary(): String {
+    val extension = lastPathSegment?.substringAfterLast('.', missingDelimiterValue = "")?.lowercase(Locale.US).orEmpty()
+    val hash = toString().hashCode().toUInt().toString(radix = 16)
+    return "scheme=${scheme.orEmpty()} extension=$extension hash=$hash"
 }
 
 fun Bundle.getParcelableUriArray(key: String): ArrayList<Uri>? = BundleCompat.getParcelableArrayList(this, key, Uri::class.java)
