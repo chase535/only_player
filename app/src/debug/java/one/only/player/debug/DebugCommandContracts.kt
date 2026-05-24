@@ -56,6 +56,8 @@ internal val CLOUD_SERVER_METHODS = setOf(
 internal val MEDIA_METHODS = setOf(
     "media.list",
     "media.move_to_recycle_bin",
+    "media.move_to_folder",
+    "media.move_folder_to_folder",
     "media.restore_from_recycle_bin",
     "media.delete_permanently",
     "media.refresh",

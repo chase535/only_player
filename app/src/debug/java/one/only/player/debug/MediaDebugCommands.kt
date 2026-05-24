@@ -7,6 +7,7 @@ import dagger.hilt.android.EntryPointAccessors
 import java.io.File
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import one.only.player.core.data.repository.MediaMoveSummary
 import one.only.player.core.data.repository.MediaRepository
 import one.only.player.core.model.Video
 
@@ -49,6 +50,36 @@ private suspend fun DebugCommandEntryPoint.runMediaAction(
                 command = command,
                 target = action,
                 value = videos.size.toString(),
+            )
+        }
+        "move_to_folder" -> {
+            val video = repository.requireDebugVideo(extras.requiredMediaTarget())
+            val targetFolderPath = extras.requiredString("target_folder")
+            val summary = repository.moveVideosToFolder(listOf(video.uriString), targetFolderPath)
+            val movedVideo = repository.findDebugVideo(video.nameWithExtension)
+            val didMove = summary.failedCount == 0 &&
+                summary.movedCount == 1 &&
+                movedVideo?.parentPath == targetFolderPath &&
+                File(movedVideo.path).exists()
+            debugResult(
+                isOk = didMove,
+                message = "summary=${summary.debugSummary()} video=${movedVideo?.debugSummary()}",
+                command = command,
+                target = action,
+                value = movedVideo?.uriString ?: video.uriString,
+            )
+        }
+        "move_folder_to_folder" -> {
+            val folderPath = extras.requiredMediaTarget()
+            val targetFolderPath = extras.requiredString("target_folder")
+            val summary = repository.moveFoldersToFolder(listOf(folderPath), targetFolderPath)
+            val movedFolder = File(targetFolderPath, File(folderPath).name)
+            debugResult(
+                isOk = summary.failedCount == 0 && summary.movedCount == 1 && movedFolder.exists(),
+                message = "summary=${summary.debugSummary()} movedFolder=${movedFolder.path} exists=${movedFolder.exists()}",
+                command = command,
+                target = action,
+                value = movedFolder.path,
             )
         }
         "move_to_recycle_bin" -> {
@@ -174,3 +205,5 @@ private suspend fun MediaRepository.requireDebugVideo(
 ): Video = findDebugVideo(target, includeRecycleBin) ?: error("Media not found: $target")
 
 private fun Video.debugSummary(): String = "name=$nameWithExtension uri=$uriString path=$path recycle=$isInRecycleBin exists=${File(path).exists()}"
+
+private fun MediaMoveSummary.debugSummary(): String = "moved=$movedCount failed=$failedCount canceled=$canceledCount"
