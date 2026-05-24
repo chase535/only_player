@@ -19,3 +19,11 @@ val Uri.isLocalPhotoPickerUri: Boolean
 
 val Uri.isCloudPhotoPickerUri: Boolean
     get() = toString().contains("com.google.android.apps.photos.cloudpicker")
+
+fun Uri.toPrivateLogSummary(): String {
+    val extension = lastPathSegment?.substringAfterLast('.', missingDelimiterValue = "")?.lowercase().orEmpty()
+    val hash = toString().hashCode().toUInt().toString(radix = 16)
+    return "scheme=${scheme.orEmpty()} extension=$extension hash=$hash"
+}
+
+fun String.toPrivateLogSummary(): String = Uri.parse(this).toPrivateLogSummary()

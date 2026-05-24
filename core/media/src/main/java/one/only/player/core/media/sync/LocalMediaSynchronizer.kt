@@ -41,6 +41,7 @@ import one.only.player.core.common.extensions.getStorageVolumes
 import one.only.player.core.common.extensions.isInsideNoMediaDirectory
 import one.only.player.core.common.extensions.prettyName
 import one.only.player.core.common.extensions.scanPaths
+import one.only.player.core.common.extensions.toPrivateLogSummary
 import one.only.player.core.common.hasManageExternalStorageAccess
 import one.only.player.core.database.converter.UriListConverter
 import one.only.player.core.database.dao.DirectoryDao
@@ -97,11 +98,11 @@ class LocalMediaSynchronizer @Inject constructor(
         val canonicalPath = path.canonicalPathOrSelf()
         val preferences = appPreferencesDataSource.preferences.first()
         if (!preferences.shouldIgnoreNoMediaFiles && File(canonicalPath).isInsideNoMediaDirectory()) {
-            Logger.info(TAG, "registerManualVideoPath skippedHiddenPath=$canonicalPath")
+            Logger.info(TAG, "registerManualVideoPath skippedHiddenPath=${canonicalPath.toPrivateLogSummary()}")
             return
         }
 
-        Logger.info(TAG, "registerManualVideoPath path=$canonicalPath")
+        Logger.info(TAG, "registerManualVideoPath path=${canonicalPath.toPrivateLogSummary()}")
         appPreferencesDataSource.update { currentPreferences ->
             val pendingPaths = currentPreferences.pendingExternalVideoPaths + canonicalPath
             currentPreferences.copy(
@@ -370,7 +371,7 @@ class LocalMediaSynchronizer @Inject constructor(
             runCatching {
                 imageLoader.diskCache?.remove(mediumWithInfo.mediumEntity.uriString)
             }.onFailure { throwable ->
-                Logger.error(TAG, "Failed to clear thumbnail cache for ${mediumWithInfo.mediumEntity.uriString}", throwable)
+                Logger.error(TAG, "Failed to clear thumbnail cache for ${mediumWithInfo.mediumEntity.uriString.toPrivateLogSummary()}", throwable)
             }
         }
 

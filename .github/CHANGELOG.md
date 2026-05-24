@@ -1,10 +1,14 @@
-- 增加独立的“记住音轨”和“记住字幕”开关
-- 修复字幕选择在重启后需要重新选择的问题
+- 重做启动页，让冷启动画面更贴近应用图标和系统明暗主题
+- 修复部分视频开启氛围模式后仍然一片黑的问题
+- 支持更细地调整字幕垂直位置
+- 改善播放列表里拖拽排序和删除当前视频时的稳定性
 
 <details>
 <summary>English Version</summary>
 
-- Add separate “Remember audio track” and “Remember subtitles” options
-- Fix subtitle selection requiring reselection after reopening the app
+- Refresh the splash screen so cold starts better match the app icon and system theme
+- Fix ambience mode still looking black on some videos
+- Support finer subtitle vertical position adjustment
+- Improve playlist drag sorting and current-video removal stability
 
 </details>

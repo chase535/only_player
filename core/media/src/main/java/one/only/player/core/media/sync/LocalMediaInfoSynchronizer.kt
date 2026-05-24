@@ -22,6 +22,7 @@ import one.only.player.core.common.Dispatcher
 import one.only.player.core.common.Logger
 import one.only.player.core.common.NextDispatchers
 import one.only.player.core.common.di.ApplicationScope
+import one.only.player.core.common.extensions.toPrivateLogSummary
 import one.only.player.core.database.dao.MediumDao
 import one.only.player.core.database.entities.AudioStreamInfoEntity
 import one.only.player.core.database.entities.SubtitleStreamInfoEntity
@@ -110,13 +111,13 @@ class LocalMediaInfoSynchronizer @Inject constructor(
 
         val mediaInfo = runCatching {
             if (uri.scheme == "file") {
-                val path = uri.path ?: throw IllegalArgumentException("No path in file URI: $uri")
+                val path = uri.path ?: throw IllegalArgumentException("No path in file URI: ${uri.toPrivateLogSummary()}")
                 MediaInfoBuilder().from(filePath = path).build()
             } else {
                 MediaInfoBuilder().from(context = context, uri = uri).build()
-            } ?: throw NullPointerException("MediaInfoBuilder returned null for $uri")
+            } ?: throw NullPointerException("MediaInfoBuilder returned null for ${uri.toPrivateLogSummary()}")
         }.onFailure { throwable ->
-            Logger.error(TAG, "Failed to read media info for $uri", throwable)
+            Logger.error(TAG, "Failed to read media info for ${uri.toPrivateLogSummary()}", throwable)
         }.getOrNull() ?: return
 
         try {
@@ -146,7 +147,7 @@ class LocalMediaInfoSynchronizer @Inject constructor(
                 mediumDao.upsert(updatedMedium)
             }
 
-            Logger.info(TAG, "performSync ok uri=$uri duration=${updatedMedium.duration}")
+            Logger.info(TAG, "performSync ok uri=${uri.toPrivateLogSummary()} duration=${updatedMedium.duration}")
         } finally {
             mediaInfo.release()
         }

@@ -422,12 +422,12 @@ class PlayerService : MediaSessionService() {
                     if (restoredSeekMap != null) {
                         preciseSeekCoordinator.markPrecise(mediaItem.mediaId)
                         resumePositionMs?.takeIf(preciseSeekCoordinator::shouldUsePreciseStartupResume)?.let {
-                            Logger.info(TAG, "Resume cached precise-seek media item=${mediaItem.mediaId} position=$it")
+                            Logger.info(TAG, "Resume cached precise-seek media=${mediaItem.mediaId.toPrivateMediaLogSummary()} position=$it")
                             mediaSession?.player?.seekTo(it)
                         }
                     } else {
                         resumePositionMs?.takeIf { it > 0L }?.let {
-                            Logger.info(TAG, "Resume deferred precise-seek media item=${mediaItem.mediaId} position=$it")
+                            Logger.info(TAG, "Resume deferred precise-seek media=${mediaItem.mediaId.toPrivateMediaLogSummary()} position=$it")
                             preciseSeekCoordinator.deferStartupResume(
                                 mediaId = mediaItem.mediaId,
                                 positionMs = it,
@@ -782,7 +782,7 @@ class PlayerService : MediaSessionService() {
             decoderPriority = DecoderPriority.PREFER_APP,
             assHandler = assHandler ?: return false,
         )
-        Logger.debug(TAG, "Retrying playback with software decoder: $mediaId")
+        Logger.debug(TAG, "Retrying playback with software decoder: ${mediaId.toPrivateMediaLogSummary()}")
 
         retryPlayer.setMediaItems(mediaItems, currentIndex, playbackPosition)
         retryPlayer.restoreRuntimeState(
@@ -929,7 +929,7 @@ class PlayerService : MediaSessionService() {
                 val dataSourceFactory = if (skipRegion != null) {
                     Logger.debug(
                         TAG,
-                        "Duplicate moov at ${skipRegion.start}+${skipRegion.length}, retrying: $mediaId",
+                        "Duplicate moov at ${skipRegion.start}+${skipRegion.length}, retrying: ${mediaId.toPrivateMediaLogSummary()}",
                     )
                     DataSource.Factory {
                         GapSkipDataSource(
@@ -941,7 +941,7 @@ class PlayerService : MediaSessionService() {
                         )
                     }
                 } else {
-                    Logger.debug(TAG, "Retrying with lenient extractor: $mediaId")
+                    Logger.debug(TAG, "Retrying with lenient extractor: ${mediaId.toPrivateMediaLogSummary()}")
                     DefaultDataSource.Factory(applicationContext)
                 }
 
@@ -2079,7 +2079,7 @@ class PlayerService : MediaSessionService() {
                 player.seekTo(index + 1, currentPosition)
                 player.playWhenReady = shouldPlayWhenReady
                 player.removeMediaItem(index)
-                Logger.info(TAG, "Applied external subtitles mediaId=$mediaId count=${configurations.size}")
+                Logger.info(TAG, "Applied external subtitles media=${mediaId.toPrivateMediaLogSummary()} count=${configurations.size}")
             }
         }
     }

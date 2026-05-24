@@ -71,6 +71,7 @@ import one.only.player.core.common.extensions.getMediaContentUri
 import one.only.player.core.common.extensions.isSubtitleExtension
 import one.only.player.core.common.extensions.resolvePrivacyPreviewScrim
 import one.only.player.core.common.extensions.scanFileForContentUri
+import one.only.player.core.common.extensions.toPrivateLogSummary
 import one.only.player.core.common.storagePermission
 import one.only.player.core.media.sync.MediaSynchronizer
 import one.only.player.core.model.ScreenOrientation
@@ -414,7 +415,7 @@ class PlayerActivity : AppCompatActivity() {
                 maybeInitControllerFuture()
                 val controller = controllerFuture?.await() ?: error("MediaController is unavailable")
                 controller.addSubtitleTrack(downloadedSubtitle.uri)
-                Logger.debug(TAG, "Add online subtitle command sent: uri=${downloadedSubtitle.uriString}")
+                Logger.debug(TAG, "Add online subtitle command sent: uri=${downloadedSubtitle.uriString.toPrivateLogSummary()}")
                 one.only.player.core.ui.R.string.online_subtitle_added
             } catch (exception: CancellationException) {
                 throw exception
@@ -463,7 +464,7 @@ class PlayerActivity : AppCompatActivity() {
         if (isReturningFromBackground || isNewUriTheCurrentMediaItem) {
             Logger.info(
                 TAG,
-                "startPlayback reused current item returning=$isReturningFromBackground same=$isNewUriTheCurrentMediaItem uri=$uri",
+                "startPlayback reused current item returning=$isReturningFromBackground same=$isNewUriTheCurrentMediaItem uri=${uri.toPrivateLogSummary()}",
             )
             mediaController?.prepare()
             mediaController?.playWhenReady = viewModel.shouldPlayWhenReady
@@ -479,18 +480,18 @@ class PlayerActivity : AppCompatActivity() {
 
     private suspend fun playVideo(uri: Uri) = withContext(Dispatchers.Default) {
         val t0 = System.currentTimeMillis()
-        Logger.info(TAG, "playVideo start uri=$uri")
+        Logger.info(TAG, "playVideo start uri=${uri.toPrivateLogSummary()}")
 
         val playbackUri = resolvePlaybackUri(uri)
         val requestHeaders = buildRequestHeadersFromIntent()
         if (uri.scheme == "file") {
             uri.path?.let { path ->
                 mediaSynchronizer.registerManualVideoPath(path)
-                Logger.info(TAG, "playVideo registeredManualPath=$path")
+                Logger.info(TAG, "playVideo registeredManualPath=${path.toPrivateLogSummary()}")
             }
         }
         val t1 = System.currentTimeMillis()
-        Logger.info(TAG, "playVideo resolveUri=${t1 - t0}ms resolved=$playbackUri")
+        Logger.info(TAG, "playVideo resolveUri=${t1 - t0}ms resolved=${playbackUri.toPrivateLogSummary()}")
 
         val playbackTarget = PlaybackTarget(
             sourceUriString = uri.toString(),
@@ -660,7 +661,7 @@ class PlayerActivity : AppCompatActivity() {
         if (uri.scheme == "file") {
             val rawPath = uri.path ?: return uri
             val canonicalPath = rawPath.canonicalPathOrSelf()
-            Logger.info(TAG, "resolveUri canonical=${System.currentTimeMillis() - t0}ms path=$canonicalPath")
+            Logger.info(TAG, "resolveUri canonical=${System.currentTimeMillis() - t0}ms path=${canonicalPath.toPrivateLogSummary()}")
 
             if (File(canonicalPath).exists()) {
                 Logger.info(TAG, "resolveUri fileFallback=${System.currentTimeMillis() - t0}ms")
@@ -669,7 +670,7 @@ class PlayerActivity : AppCompatActivity() {
 
             if (hasMediaReadPermission()) {
                 scanFileForContentUri(path = canonicalPath, timeoutMs = 800L)?.let {
-                    Logger.info(TAG, "resolveUri scanFile=${System.currentTimeMillis() - t0}ms result=$it")
+                    Logger.info(TAG, "resolveUri scanFile=${System.currentTimeMillis() - t0}ms result=${it.toPrivateLogSummary()}")
                     return it
                 }
                 Logger.info(TAG, "resolveUri scanFileMiss=${System.currentTimeMillis() - t0}ms")

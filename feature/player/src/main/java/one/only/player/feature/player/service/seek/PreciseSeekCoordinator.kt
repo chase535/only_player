@@ -115,7 +115,7 @@ internal class PreciseSeekCoordinator(
             val elapsed = System.currentTimeMillis() - startTime
 
             if (cuePoints == null) {
-                Logger.debug(TAG, "MKV Cues pre-parse returned null for $mediaId (${elapsed}ms)")
+                Logger.debug(TAG, "MKV Cues pre-parse returned null for ${mediaLogSummary(mediaId)} (${elapsed}ms)")
                 return@async null
             }
 
@@ -125,7 +125,7 @@ internal class PreciseSeekCoordinator(
             persistSeekMap(uri, cuePoints, durationUs)
             Logger.info(
                 TAG,
-                "MKV Cues pre-parsed: ${cuePoints.size} cue points in ${elapsed}ms for $mediaId",
+                "MKV Cues pre-parsed: ${cuePoints.size} cue points in ${elapsed}ms for ${mediaLogSummary(mediaId)}",
             )
             seekMap
         }
@@ -179,7 +179,7 @@ internal class PreciseSeekCoordinator(
                 if (current.mediaId != mediaId) return@withContext
                 if (pendingStartupResumeToken != mediaId) return@withContext
                 clearPendingStartupResume()
-                Logger.info(TAG, "Resume deferred precise-seek media item=$mediaId position=$targetPosition")
+                Logger.info(TAG, "Resume deferred precise-seek media=${mediaLogSummary(mediaId)} position=$targetPosition")
                 promoteCurrentItemToPreciseSeek(targetPosition)
             }
         }
@@ -218,14 +218,14 @@ internal class PreciseSeekCoordinator(
         if (startDelta < FAST_SEEK_MIN_DELTA_MS) {
             Logger.info(
                 TAG,
-                "Skip precise promotion mediaId=${currentItem.mediaId} target=$targetPosition start=$startPosition",
+                "Skip precise promotion media=${mediaLogSummary(currentItem.mediaId)} target=$targetPosition start=$startPosition",
             )
             return SessionResult(SessionResult.RESULT_SUCCESS)
         }
 
         Logger.info(
             TAG,
-            "Promote to precise seek mediaId=${currentItem.mediaId} start=$startPosition target=$targetPosition",
+            "Promote to precise seek media=${mediaLogSummary(currentItem.mediaId)} start=$startPosition target=$targetPosition",
         )
         return promoteCurrentItemToPreciseSeek(targetPosition)
     }
@@ -334,7 +334,7 @@ internal class PreciseSeekCoordinator(
             }
         }.onFailure {
             cacheFile.delete()
-            Logger.debug(TAG, "Failed to persist MKV cue cache for $uri")
+            Logger.debug(TAG, "Failed to persist MKV cue cache for ${mediaLogSummary(uri.toString())}")
         }
     }
 
