@@ -176,12 +176,23 @@ private class AdvancedSubtitleTextView(context: Context) : TextView(context) {
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = outlineThickness
             paint.color = Color.BLACK
-            super.onDraw(canvas)
+            drawTextLayout(canvas)
         }
 
         paint.style = Paint.Style.FILL
         paint.color = currentTextColor
         super.onDraw(canvas)
+    }
+
+    private fun drawTextLayout(canvas: Canvas) {
+        val layout = layout ?: return
+        canvas.save()
+        canvas.translate(
+            totalPaddingLeft.toFloat(),
+            (height - totalPaddingBottom - layout.height).toFloat(),
+        )
+        layout.draw(canvas)
+        canvas.restore()
     }
 }
 
