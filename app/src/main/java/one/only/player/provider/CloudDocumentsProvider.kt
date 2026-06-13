@@ -646,12 +646,14 @@ class CloudDocumentsProvider : DocumentsProvider() {
         name: String,
         declaredMimeType: String?,
     ): String {
+        val extension = name.substringAfterLast('.', missingDelimiterValue = "").lowercase()
+        if (extension == WEBVTT_EXTENSION) return FALLBACK_WEBVTT_MIME
+
         val cleanMimeType = declaredMimeType.orEmpty().takeIf {
             it.isNotBlank() && it != "application/octet-stream" && it != "audio/aac"
         }
         if (cleanMimeType != null) return cleanMimeType
 
-        val extension = name.substringAfterLast('.', missingDelimiterValue = "").lowercase()
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
             ?: when {
                 VIDEO_EXTENSIONS.contains(extension) -> FALLBACK_VIDEO_MIME
@@ -686,6 +688,7 @@ class CloudDocumentsProvider : DocumentsProvider() {
         private const val FALLBACK_VIDEO_MIME = "video/*"
         private const val FALLBACK_BINARY_MIME = "application/octet-stream"
         private const val FALLBACK_SUBTITLE_MIME = "application/x-subrip"
+        private const val FALLBACK_WEBVTT_MIME = "text/vtt"
         private const val ROOT_MIME_TYPES = "video/*\napplication/x-matroska\nvideo/mp4\napplication/x-subrip\ntext/vtt\ntext/x-ssa\ntext/x-ass\napplication/ass\napplication/ssa\ntext/plain"
 
         private const val ROOT_FLAGS =
@@ -740,7 +743,10 @@ class CloudDocumentsProvider : DocumentsProvider() {
             "ssa",
             "sub",
             "vtt",
+            WEBVTT_EXTENSION,
         )
+
+        private const val WEBVTT_EXTENSION = "webvtt"
     }
 }
 

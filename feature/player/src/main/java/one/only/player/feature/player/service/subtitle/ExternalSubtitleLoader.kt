@@ -207,6 +207,7 @@ internal class ExternalSubtitleLoader(
             "ssa",
             "ttml",
             "vtt",
+            "webvtt",
         )
     }
 }

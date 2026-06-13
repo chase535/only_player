@@ -24,7 +24,8 @@ fun Uri.getSubtitleMime(displayName: String? = null): String {
     return when {
         name.endsWith(".ssa", ignoreCase = true) ||
             name.endsWith(".ass", ignoreCase = true) -> MimeTypes.TEXT_SSA
-        name.endsWith(".vtt", ignoreCase = true) -> MimeTypes.TEXT_VTT
+        name.endsWith(".vtt", ignoreCase = true) ||
+            name.endsWith(".webvtt", ignoreCase = true) -> MimeTypes.TEXT_VTT
         name.endsWith(".ttml", ignoreCase = true) ||
             name.endsWith(".xml", ignoreCase = true) ||
             name.endsWith(".dfxp", ignoreCase = true) -> MimeTypes.APPLICATION_TTML
