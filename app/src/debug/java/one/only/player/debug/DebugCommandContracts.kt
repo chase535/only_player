@@ -67,6 +67,11 @@ internal val CLOUD_QUICK_SETTINGS_METHODS = setOf(
     "cloud.quick_settings.set",
 )
 
+internal val QUICK_SETTINGS_METHODS = setOf(
+    "quick_settings.get",
+    "quick_settings.set",
+)
+
 internal val FAVORITE_METHODS = setOf(
     "favorite.add",
     "favorite.list",
