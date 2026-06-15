@@ -398,14 +398,16 @@ data class MediaPickerMoveSelection(
     val totalCount: Int = videoUris.distinct().size + folderPaths.distinct().size
 
     fun canMoveTo(targetFolderPath: String): Boolean {
-        val targetPath = targetFolderPath.canonicalPathOrSelf()
-        if (targetPath in videoParentPaths.map(String::canonicalPathOrSelf)) return false
-        if (targetPath in folderParentPaths.map(String::canonicalPathOrSelf)) return false
-        return folderPaths.map(String::canonicalPathOrSelf).none { folderPath ->
+        val targetPath = targetFolderPath.normalizedMovePath()
+        if (targetPath in videoParentPaths.map(String::normalizedMovePath)) return false
+        if (targetPath in folderParentPaths.map(String::normalizedMovePath)) return false
+        return folderPaths.map(String::normalizedMovePath).none { folderPath ->
             targetPath == folderPath || targetPath.startsWith("$folderPath/")
         }
     }
 }
+
+private fun String.normalizedMovePath(): String = canonicalPathOrSelf().replace(File.separatorChar, '/')
 
 @Singleton
 class MediaPickerMoveSelectionStore @Inject constructor() {

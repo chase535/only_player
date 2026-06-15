@@ -129,7 +129,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     ksp(libs.kotlin.metadata.jvm)
-    kspAndroidTest(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.github.anilbeesetti.nextlib.mediainfo)
@@ -137,14 +136,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.smbj)
 
-    testImplementation(libs.junit4)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.test.ext)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.compose.ui.test)
-    androidTestImplementation(project(":feature:player"))
     debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.testManifest)
     debugImplementation(libs.androidx.media3.session)
     debugImplementation(libs.kotlinx.coroutines.android)
     debugImplementation(libs.kotlinx.coroutines.guava)
