@@ -220,7 +220,6 @@ data class PlayerPreferencesUiState(
 
 sealed interface PlayerPreferenceDialog {
     data object ControllerAutoHideDialog : PlayerPreferenceDialog
-    data object ControllerAutoHideCustomDialog : PlayerPreferenceDialog
     data object PlayerScreenOrientationDialog : PlayerPreferenceDialog
     data object ControlButtonsDialog : PlayerPreferenceDialog
     data object PlayerIconStyleDialog : PlayerPreferenceDialog

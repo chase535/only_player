@@ -2,17 +2,21 @@ package one.only.player.settings.screens.player
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -269,33 +273,14 @@ private fun PlayerPreferencesContent(
         uiState.showDialog?.let { showDialog ->
             when (showDialog) {
                 PlayerPreferenceDialog.ControllerAutoHideDialog -> {
-                    OptionsDialog(
-                        text = stringResource(id = R.string.controller_timeout_select),
-                        onDismissClick = { onEvent(PlayerPreferencesUiEvent.ShowDialog(null)) },
-                    ) {
-                        items(ControllerAutoHidePreset.entries.toTypedArray()) {
-                            RadioTextButton(
-                                modifier = Modifier.testTag("option_settings_player_controller_timeout_${it.name.lowercase()}"),
-                                text = it.description(uiState.preferences),
-                                isSelected = it == uiState.preferences.controllerAutoHidePreset,
-                                onClick = {
-                                    if (it == ControllerAutoHidePreset.CUSTOM) {
-                                        onEvent(PlayerPreferencesUiEvent.ShowDialog(PlayerPreferenceDialog.ControllerAutoHideCustomDialog))
-                                    } else {
-                                        onEvent(PlayerPreferencesUiEvent.UpdateControlAutoHidePreset(it))
-                                        onEvent(PlayerPreferencesUiEvent.ShowDialog(null))
-                                    }
-                                },
-                            )
-                        }
-                    }
-                }
-
-                PlayerPreferenceDialog.ControllerAutoHideCustomDialog -> {
-                    ControllerAutoHideCustomDialog(
-                        initialValue = uiState.preferences.controllerAutoHideTimeout,
+                    ControllerAutoHideDialog(
+                        preferences = uiState.preferences,
                         onDismiss = { onEvent(PlayerPreferencesUiEvent.ShowDialog(null)) },
-                        onConfirm = {
+                        onPresetSelected = {
+                            onEvent(PlayerPreferencesUiEvent.UpdateControlAutoHidePreset(it))
+                            onEvent(PlayerPreferencesUiEvent.ShowDialog(null))
+                        },
+                        onCustomConfirm = {
                             onEvent(PlayerPreferencesUiEvent.UpdateControlAutoHideTimeout(it))
                             onEvent(PlayerPreferencesUiEvent.ShowDialog(null))
                         },
@@ -383,36 +368,73 @@ private fun PlayerPreferencesContent(
 }
 
 @Composable
-private fun ControllerAutoHideCustomDialog(
-    initialValue: Int,
+private fun ControllerAutoHideDialog(
+    preferences: PlayerPreferences,
     onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit,
+    onPresetSelected: (ControllerAutoHidePreset) -> Unit,
+    onCustomConfirm: (Int) -> Unit,
 ) {
-    var value by rememberSaveable(initialValue) { mutableStateOf(initialValue.coerceAtLeast(1).toString()) }
+    var isCustomSelected by rememberSaveable {
+        mutableStateOf(preferences.controllerAutoHidePreset == ControllerAutoHidePreset.CUSTOM)
+    }
+    var value by rememberSaveable {
+        mutableStateOf(preferences.controllerAutoHideTimeout.coerceAtLeast(1).toString())
+    }
     val seconds = value.toIntOrNull()?.coerceAtLeast(1)
 
     NextDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.custom_controller_timeout)) },
+        title = { Text(stringResource(id = R.string.controller_timeout_select)) },
         content = {
-            OutlinedTextField(
-                value = value,
-                onValueChange = { input -> value = input.filter(Char::isDigit) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("input_settings_player_controller_timeout_custom"),
-                singleLine = true,
-                label = { Text(stringResource(R.string.enter_seconds)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            )
+            HorizontalDivider()
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 8.dp),
+                modifier = Modifier.selectableGroup(),
+            ) {
+                items(ControllerAutoHidePreset.entries.toTypedArray()) {
+                    RadioTextButton(
+                        modifier = Modifier.testTag("option_settings_player_controller_timeout_${it.name.lowercase()}"),
+                        text = it.description(preferences),
+                        isSelected = when (it) {
+                            ControllerAutoHidePreset.CUSTOM -> isCustomSelected
+                            else -> !isCustomSelected && it == preferences.controllerAutoHidePreset
+                        },
+                        onClick = {
+                            if (it == ControllerAutoHidePreset.CUSTOM) {
+                                isCustomSelected = true
+                            } else {
+                                onPresetSelected(it)
+                            }
+                        },
+                    )
+                }
+                if (isCustomSelected) {
+                    item {
+                        OutlinedTextField(
+                            value = value,
+                            onValueChange = { input -> value = input.filter(Char::isDigit) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .testTag("input_settings_player_controller_timeout_custom"),
+                            singleLine = true,
+                            label = { Text(stringResource(R.string.enter_seconds)) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        )
+                    }
+                }
+            }
+            HorizontalDivider()
         },
         confirmButton = {
-            TextButton(
-                modifier = Modifier.testTag("btn_settings_player_controller_timeout_custom_confirm"),
-                enabled = seconds != null,
-                onClick = { seconds?.let(onConfirm) },
-            ) {
-                Text(stringResource(R.string.done))
+            if (isCustomSelected) {
+                TextButton(
+                    modifier = Modifier.testTag("btn_settings_player_controller_timeout_custom_confirm"),
+                    enabled = seconds != null,
+                    onClick = { seconds?.let(onCustomConfirm) },
+                ) {
+                    Text(stringResource(R.string.done))
+                }
             }
         },
         dismissButton = { CancelButton(onClick = onDismiss) },
