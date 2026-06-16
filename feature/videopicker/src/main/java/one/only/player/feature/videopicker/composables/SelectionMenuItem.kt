@@ -44,7 +44,7 @@ fun SelectionMenuItem(
             .defaultMinSize(minHeight = 40.dp)
             .padding(horizontal = 8.dp, vertical = 1.dp)
             .clip(RoundedCornerShape(6.dp))
-            .semantics { contentDescription = testTag }
+            .semantics { contentDescription = text }
             .testTag(testTag),
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
     )
