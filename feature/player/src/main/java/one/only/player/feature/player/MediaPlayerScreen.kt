@@ -954,7 +954,7 @@ internal fun MediaPlayerScreen(
                         externalSubtitleFontSource = externalSubtitleFontSource,
                     ),
                     decoderPriority = playerPreferences.decoderPriority,
-                    shouldUseTextureView = isAmbienceModeEnabled || isVideoMirrored,
+                    shouldUseTextureView = isVideoMirrored,
                     isVideoMirrored = isVideoMirrored,
                 )
 
