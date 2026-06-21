@@ -97,7 +97,10 @@ fun PlayerContentFrame(
         if (rotation == 90 || rotation == 270) Size(h, w) else Size(w, h)
     }
     val presentationVideoSizePx = presentationState.videoSizeDp
-    val sourceVideoSizePx = metadataVideoSizePx ?: presentationVideoSizePx
+    val sourceVideoSizePx = when {
+        isAmbienceModeEnabled -> metadataVideoSizePx ?: presentationVideoSizePx
+        else -> presentationVideoSizePx ?: metadataVideoSizePx
+    }
 
     key(surfaceRefreshKey, surfaceType) {
         BoxWithConstraints(

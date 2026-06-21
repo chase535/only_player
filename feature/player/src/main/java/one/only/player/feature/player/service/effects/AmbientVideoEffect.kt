@@ -120,7 +120,7 @@ internal class AmbientVideoEffect(
         private const val POSITION_COMPONENT_COUNT = 4
         private const val VERTEX_COUNT = 4
         private const val BLUR_STEP_PIXELS = 26f
-        private const val MAX_CANVAS_EXPANSION = 8f
+        private const val MAX_CANVAS_EXPANSION = 2.4f
 
         private fun centerRect(
             inputAspectRatio: Float,
